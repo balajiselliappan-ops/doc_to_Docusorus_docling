@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Docusaurus Preview</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f8fafc; color: #0f172a; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 3rem; line-height: 1.65; }
+    h1, h2, h3, h4 { line-height: 1.3; }
+    pre { background: #0b1220; color: #e2e8f0; padding: 1rem; border-radius: 10px; overflow-x: auto; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.5rem; text-align: left; }
+    th { background: #e2e8f0; }
+    mark.keyword-mark { background: #fff7cc; border: 1px solid #f59f00; padding: 0 2px; border-radius: 4px; }
+    img { display: block; max-width: 100%; height: auto; margin: 1rem auto; border-radius: 8px; }
+    p > img { margin-top: 1rem; margin-bottom: 1rem; }
+    main { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main>
+<h1>Jira Q&amp;A</h1>
+<h2>How do we secure credentials and tokens?</h2>
+<p>Based on the actual code in <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html"><code>server.py</code></a> and the <code>.env</code> file:</p>
+<h3>What is currently in place:</h3>
+<h3>OAuth Tokens</h3>
+<ul>
+<li>Access tokens are never stored in the browser — they live in a server-side Flask session.</li>
+<li>Session cookie is <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">httponly=True</a> (JS cannot read it) and <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">samesite=Lax</a> (CSRF protection).</li>
+<li>Sessions are stored in <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">jira_dashboard_sessions</a> on the server, not in the cookie payload.</li>
+<li>Tokens include <code>offline_access</code> scope for refresh without re-login.</li>
+</ul>
+<h3>App Secrets (Client ID / Secret)</h3>
+<ul>
+<li>Loaded at runtime via <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">os.getenv()</a> from the <code>.env</code> file — never hardcoded in source.</li>
+<li><code>.env</code> should be in <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">.gitignore</a> so it is never committed to version control.</li>
+</ul>
+<h3>Session Security</h3>
+<ul>
+<li>Session cookie name is custom (<code>jira_dashboard_session</code>) to avoid fingerprinting.</li>
+<li><code>SESSION_COOKIE_SECURE = False</code> currently — this must be set to <code>True</code> in production (HTTPS only).</li>
+</ul>
+<h3>What still needs to be done (gaps):</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Gap</strong></th>
+<th><strong>Risk</strong></th>
+<th><strong>Fix</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.env</code> currently has live secrets visible in the file</td>
+<td>High — if repo is public or shared, credentials leak</td>
+<td>Rotate keys immediately; add <code>.env</code> to <code>.gitignore</code></td>
+</tr>
+<tr>
+<td><code>SESSION_COOKIE_SECURE = False</code></td>
+<td>Tokens could transmit over HTTP</td>
+<td>Set to <code>True</code> behind HTTPS in production</td>
+</tr>
+<tr>
+<td>No token expiry/rotation handling visible</td>
+<td>Stale tokens could persist</td>
+<td>Add refresh token logic and session expiry checks</td>
+</tr>
+<tr>
+<td>No secret scanning in CI</td>
+<td>Future accidental commits go undetected</td>
+<td>Add <code>truffleHog</code> or <code>gitleaks</code> pre-commit hook</td>
+</tr>
+</tbody>
+</table>
+<h3>Recommended immediate actions:</h3>
+<ol>
+<li>Rotate <code>JIRA_CLIENT_SECRET</code> and <code>QWEN_API_KEY</code> — both are currently exposed in the shared <code>.env</code>.</li>
+<li>Add <code>.env</code> to <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">.gitignore</a> if not already there.</li>
+<li>Use a secrets manager (e.g. AWS Secrets Manager, Doppler, or GitHub Secrets for CI) for production deployment.</li>
+</ol>
+<h2>What if Atlassian API permissions vary by tenant?</h2>
+<p>Based directly on the code in <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html"><code>server.py:734-770</code></a>, here is exactly what happens:</p>
+<h3>The app has a 3-tier fallback chain:</h3>
+<h3>Tier 1 — Atlassian <code>/me</code> endpoint</h3>
+<ul>
+<li>Called first after token exchange.</li>
+<li>Works on most standard tenants.</li>
+<li>Returns: name, email, profile picture.</li>
+</ul>
+<h3>Tier 2 — Jira <code>/rest/api/3/myself</code> endpoint</h3>
+<ul>
+<li>Triggered automatically if <code>/me</code> returns 403.</li>
+<li>Uses the cloud ID of the user's first accessible Jira site.</li>
+<li>Returns: <code>displayName</code>, <code>emailAddress</code>, avatar URL.</li>
+<li>This covers tenants where the identity scope is restricted but Jira API access is permitted.</li>
+</ul>
+<h3>Tier 3 — Graceful degradation</h3>
+<ul>
+<li>If both endpoints fail (any exception), the app falls back to using the Jira site name as the user identity.</li>
+<li>The user still gets logged in and can use the dashboard.</li>
+<li>Name and email fields will be empty, but the session is valid.</li>
+</ul>
+<h3>In practice:</h3>
+<ul>
+<li>The user never sees an error due to tenant permission differences.</li>
+<li>The login flow completes regardless of which tier succeeds.</li>
+<li>Only the displayed user name/email may be less detailed if lower tiers are used.</li>
+</ul>
+<h3>The one gap to be aware of:</h3>
+<ul>
+<li>If a tenant blocks all three paths AND has no accessible sites, the app correctly shows a "no Jira sites found" error and stops the login — which is the right behavior since the user genuinely has no accessible data.</li>
+</ul>
+<h2>How is user access controlled?</h2>
+<p>Based on the actual code in <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html"><code>server.py</code></a>, here is how user access is controlled:</p>
+<h3>1. OAuth Authentication (Atlassian)</h3>
+<ul>
+<li>Every user must log in via Atlassian OAuth. No shared/hardcoded Jira account is used.</li>
+<li>The app requests scopes: <code>read:jira-work</code>, <code>write:jira-work</code>, <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">read:jira-user</a>, <code>offline_access</code>, <code>openid</code>, <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">email</a>.</li>
+<li>Only users with a valid Atlassian account and access to at least one Jira site can proceed.</li>
+</ul>
+<h3>2. Session-based Access</h3>
+<ul>
+<li>After login, the user's OAuth token, identity, selected site, and selected project are stored in a server-side session.</li>
+<li>All subsequent API calls use that user's own token — not a shared app token.</li>
+</ul>
+<h3>3. <code>@login_required</code> Decorator</h3>
+<ul>
+<li>Every protected route is guarded by a <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">login_required</a> decorator.</li>
+<li>If no valid session exists, the user is redirected to the login page.</li>
+</ul>
+<h3>4. Per-user Data Scoping</h3>
+<ul>
+<li>Jira data is fetched using the logged-in user's token, so they only see sites and projects their Atlassian account has permission to access.</li>
+<li>Dashboard data and cache are keyed per user to prevent cross-user data leakage.</li>
+</ul>
+<h3>5. Site and Project Selection</h3>
+<ul>
+<li>After login, the user explicitly selects which Jira site and project to work with — they cannot access sites outside their Atlassian permissions.</li>
+</ul>
+<h1>In short</h1>
+<p>Access is controlled at three layers — Atlassian identity, session validity, and route-level guards — with all data scoped to the authenticated user's own Jira permissions.</p>
+<p>Based on the current state of the codebase (app is already running, OAuth flow is working, dashboard and metrics are functional), here is a realistic phased rollout:</p>
+<h2>Phase 1 — Internal Validation (Week 1–2)</h2>
+<ul>
+<li>Run the app with 1–2 internal users on real Jira projects</li>
+<li>Verify OAuth flow, site/project selection, and metrics accuracy</li>
+<li>Fix any environment-specific issues (venv, Python version, config)</li>
+<li>Rotate exposed credentials and add <code>.env</code> to <a href="vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html">.gitignore</a></li>
+</ul>
+<h2>Phase 2 — Pilot with Small Team (Week 3–4)</h2>
+<ul>
+<li>Onboard 3–5 users from one team</li>
+<li>Collect feedback on dashboard usefulness and UX gaps</li>
+<li>Identify missing metrics or workflow steps</li>
+<li>Document setup process for repeatable onboarding</li>
+</ul>
+<h2>Phase 3 — Hardening (Week 5–6)</h2>
+<ul>
+<li>Add automated tests for critical API flows</li>
+<li>Improve error messages and edge case handling</li>
+<li>Add secret scanning, basic CI checks</li>
+<li>Address any findings from pilot feedback</li>
+</ul>
+<h2>Phase 4 — Broader Rollout (Week 7–8)</h2>
+<ul>
+<li>Onboard additional teams or projects</li>
+<li>Enable multi-project support if needed</li>
+<li>Begin roadmap items: role-based access, forecasting widgets</li>
+</ul>
+<h2>What would accelerate this</h2>
+<ul>
+<li>Stable hosting environment (not just local <code>python server.py</code>)</li>
+<li>A shared deployment (e.g. internal server or cloud VM) so others don't need local setup</li>
+<li>A registered Atlassian OAuth app with correct redirect URIs for the hosted URL</li>
+</ul>
+<h2>What could delay it</h2>
+<ul>
+<li>Atlassian OAuth app not approved/configured for non-localhost redirects</li>
+<li>Office network proxy blocking Atlassian/AI API calls</li>
+<li>Credential rotation and secret management setup taking time</li>
+</ul>
+  </main>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Docusaurus Preview</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f8fafc; color: #0f172a; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 3rem; line-height: 1.65; }
+    h1, h2, h3, h4 { line-height: 1.3; }
+    pre { background: #0b1220; color: #e2e8f0; padding: 1rem; border-radius: 10px; overflow-x: auto; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.5rem; text-align: left; }
+    th { background: #e2e8f0; }
+    mark.keyword-mark { background: #fff7cc; border: 1px solid #f59f00; padding: 0 2px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <main>
+<h1>Portal Documentation</h1>
+<p>slug: /portaldocumentation</p>
+<h2>Jira AI Chatbot Portal</h2>
+<h3>Technical Documentation &amp; User Guide</h3>
+<p><strong>March 2026  |  POC Version 1.0</strong></p>
+<h2>2. AI Commands — Complete Reference</h2>
+<p>All commands are typed in natural language in the chat box. No special syntax required.</p>
+<h3>2.1 Display &amp; Query Commands</h3>
+<p>These commands make the AI answer from Jira data directly — no action is taken.</p>
+<h3>2.2 Create Ticket Commands</h3>
+<p>These commands create a new Jira issue in the sprint selected in the dropdown.</p>
+<h3>2.3 Update Ticket Commands</h3>
+<p>These commands update existing Jira tickets.</p>
+<h3>2.4 Move Ticket Commands</h3>
+<p>These commands move tickets between sprints.</p>
+<h3>2.5 Rebalance &amp; Assign Commands</h3>
+<p>These commands automatically distribute work across team members.</p>
+<h3>2.6 Export Commands</h3>
+<p>These commands trigger data export.</p>
+<h3>2.7 Email Report Commands</h3>
+<p>These commands generate and email a sprint report.</p>
+<h3>2.8 Voice Commands</h3>
+<p>Click the microphone icon and speak any of the above commands. Groq Whisper transcribes your speech to text automatically. Same commands work — just spoken instead of typed.</p>
+<h2>4. Comparison — Our Portal vs Jira Cloud App</h2>
+<p>The Jira Cloud App refers to the official Jira web interface at <code>company.atlassian.net</code> and the MS Teams Jira App.</p>
+<h3>4.1 Feature Comparison</h3>
+<h3>4.2 Key Differentiators</h3>
+<h4>What Our Portal Does That Jira Cloud Cannot</h4>
+<ul>
+<li>Natural language queries — ask questions in plain English, get intelligent answers</li>
+<li>AI-powered analysis — 'who is overloaded?' or 'what is at risk?' gives instant insights</li>
+<li>Agentic actions — AI creates, updates, moves tickets based on your intent</li>
+<li>Auto rebalancing — AI automatically redistributes workload across team</li>
+<li>Voice commands — speak instead of type</li>
+<li>Custom dashboard — designed specifically for sprint management at a glance</li>
+<li>Excel export with charts — one-click download including visual charts</li>
+<li>Email reports on demand — type a command and AI emails the report</li>
+</ul>
+<h4>What Jira Cloud Does Better</h4>
+<ul>
+<li>Full Jira feature set — epics, roadmaps, custom workflows, automation rules</li>
+<li>Mobile native app — iOS and Android with push notifications</li>
+<li>Enterprise admin — user management, permissions, SSO</li>
+<li>Official support — Atlassian backed with SLA</li>
+<li>Deep integrations — Confluence, Bitbucket, all Atlassian products</li>
+<li>Compliance certifications — SOC2, ISO27001, GDPR certified</li>
+</ul>
+<h3>4.3 vs MS Teams Jira App Specifically</h3>
+<h3>4.4 Ideal Use Case</h3>
+<hr>
+<h2>5. Technology Stack Summary</h2>
+<p>Jira AI Chatbot Portal — POC Documentation — March 2026</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Method</th>
+<th>What it Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/chat</code></td>
+<td>POST</td>
+<td>Receives user message, fetches Jira data, calls AI, returns reply</td>
+</tr>
+<tr>
+<td><code>/sprint</code></td>
+<td>GET</td>
+<td>Returns active sprint data — used by keep-alive ping</td>
+</tr>
+<tr>
+<td><code>/sprint/by-id</code></td>
+<td>POST</td>
+<td>Returns data for a specific sprint selected in dropdown</td>
+</tr>
+<tr>
+<td><code>/sprints/list</code></td>
+<td>GET</td>
+<td>Returns all sprints for the dropdown selector</td>
+</tr>
+<tr>
+<td><code>/export</code></td>
+<td>POST</td>
+<td>Generates and downloads Excel file with sprint data + charts</td>
+</tr>
+<tr>
+<td><code>/transcribe</code></td>
+<td>POST</td>
+<td>Receives audio file, sends to Groq Whisper, returns text</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get_boards()</code></td>
+<td>Fetches all Jira boards in your workspace</td>
+</tr>
+<tr>
+<td><code>get_active_sprint(board_id)</code></td>
+<td>Finds the currently running sprint</td>
+</tr>
+<tr>
+<td><code>get_sprint_issues(board_id, sprint_id)</code></td>
+<td>Fetches all issues in a given sprint</td>
+</tr>
+<tr>
+<td><code>get_sprint_summary()</code></td>
+<td>Returns complete sprint data including stats — used by <code>/chat</code> and <code>/sprint</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_agent(user_message, jira_data)</code></td>
+<td>Main function — sends message to Groq AI with sprint context and tool definitions</td>
+</tr>
+<tr>
+<td><code>TOOLS list</code></td>
+<td>Defines all 5 actions the AI can take: create, update, move, rebalance, send report</td>
+</tr>
+<tr>
+<td>Tool routing logic</td>
+<td>After AI picks a tool, routes to the correct agent_tools function</td>
+</tr>
+<tr>
+<td>Final summary call</td>
+<td>Second AI call to summarise what action was taken in plain English</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create_issue(project_key, summary, ...)</code></td>
+<td>Creates a new Jira ticket and adds it to the selected sprint</td>
+</tr>
+<tr>
+<td><code>update_issue(issue_key, status, ...)</code></td>
+<td>Updates status, assignee or title of an existing ticket</td>
+</tr>
+<tr>
+<td><code>move_to_sprint(issue_keys, target)</code></td>
+<td>Moves one or more tickets to a different sprint</td>
+</tr>
+<tr>
+<td><code>rebalance_tasks()</code></td>
+<td>Analyses workload per team member and reassigns from overloaded to underloaded</td>
+</tr>
+<tr>
+<td><code>send_sprint_report(to_email)</code></td>
+<td>Generates HTML sprint report and emails it via Gmail SMTP</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What it Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1>UI Components</h1>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sidebar</td>
+<td>Navigation links for Dashboard, Sprints, Resources, Reports tabs + Export button</td>
+</tr>
+<tr>
+<td>Topbar</td>
+<td>Page title display</td>
+</tr>
+<tr>
+<td>Dashboard tab</td>
+<td>Sprint dropdown, donut chart canvas, bar chart canvas, chat area, input box</td>
+</tr>
+<tr>
+<td>Sprints tab</td>
+<td>Container for sprint issues table rendered by JavaScript</td>
+</tr>
+<tr>
+<td>Resources tab</td>
+<td>Container for team workload bar chart rendered by JavaScript</td>
+</tr>
+<tr>
+<td>Reports tab</td>
+<td>Container for summary and assignee report tables rendered by JavaScript</td>
+</tr>
+<tr>
+<td>Script tags</td>
+<td>Loads Chart.js from CDN, loads app.js, runs keep-alive ping every 4 minutes</td>
+</tr>
+</tbody>
+</table>
+<h1>CSS Classes</h1>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>What it Styles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.app</td>
+<td>Main flex container — sidebar + main area side by side</td>
+</tr>
+<tr>
+<td>.sidebar</td>
+<td>Left navigation panel — width, background, padding</td>
+</tr>
+<tr>
+<td>.nav-link / .nav-link.active</td>
+<td>Sidebar navigation items and highlighted active state</td>
+</tr>
+<tr>
+<td>.tab-content / .hidden</td>
+<td>Shows/hides tabs when switching between Dashboard, Sprints etc.</td>
+</tr>
+<tr>
+<td>.chat-area</td>
+<td>Scrollable message history area</td>
+</tr>
+<tr>
+<td>.message.bot / .message.user</td>
+<td>Chat bubble styling — white for bot, blue for user</td>
+</tr>
+<tr>
+<td>.input-area</td>
+<td>Bottom input box and send button container</td>
+</tr>
+<tr>
+<td>.panel-card</td>
+<td>White card containers used in Sprints, Resources, Reports tabs</td>
+</tr>
+<tr>
+<td>.stat-box / .stat-num</td>
+<td>KPI summary boxes showing Total, Done, Blocked counts</td>
+</tr>
+<tr>
+<td>.pill-done/prog/todo/block</td>
+<td>Colour-coded status badges on issue rows</td>
+</tr>
+<tr>
+<td>.bar-wrap / .bar-fill</td>
+<td>Horizontal progress bars in Resources tab</td>
+</tr>
+<tr>
+<td>table / th / td</td>
+<td>Issue table styling across all tabs</td>
+</tr>
+</tbody>
+</table>
+<h1>JavaScript Functions</h1>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>const API</td>
+<td>Single variable holding Render backend URL — change this to switch environments</td>
+</tr>
+<tr>
+<td>formatMarkdown(text)</td>
+<td>Converts AI markdown replies (bold, bullets, headings) to HTML for display</td>
+</tr>
+<tr>
+<td>addMessage(text, sender)</td>
+<td>Creates and appends a chat bubble to the chat area</td>
+</tr>
+<tr>
+<td>addExportMessage(text)</td>
+<td>Creates a special bot message with a Download Excel button embedded</td>
+</tr>
+<tr>
+<td>showTyping() / removeTyping()</td>
+<td>Shows and removes the '...' typing indicator while AI is thinking</td>
+</tr>
+<tr>
+<td>loadSprintDropdown()</td>
+<td>Fetches all sprints from /sprints/list and populates the dropdown</td>
+</tr>
+<tr>
+<td>loadSprintData()</td>
+<td>Fetches data for the currently selected sprint from /sprint/by-id</td>
+</tr>
+<tr>
+<td>onSprintChange()</td>
+<td>Triggered when dropdown changes — reloads all tabs with new sprint data</td>
+</tr>
+<tr>
+<td>showTab(name, e)</td>
+<td>Switches between Dashboard, Sprints, Resources, Reports tabs</td>
+</tr>
+<tr>
+<td>sendMessage()</td>
+<td>Sends user message to /chat, shows reply, handles export action</td>
+</tr>
+<tr>
+<td>renderCharts(force)</td>
+<td>Draws donut and bar charts using Chart.js with sprint data</td>
+</tr>
+<tr>
+<td>renderSprints()</td>
+<td>Builds the full issues table for the Sprints tab</td>
+</tr>
+<tr>
+<td>renderResources()</td>
+<td>Builds the workload bar chart for the Resources tab</td>
+</tr>
+<tr>
+<td>renderReports()</td>
+<td>Builds summary and assignee tables for the Reports tab</td>
+</tr>
+<tr>
+<td>exportExcel()</td>
+<td>Captures chart images from canvas, sends to /export, triggers download</td>
+</tr>
+<tr>
+<td>toggleRecording()</td>
+<td>Starts/stops microphone recording for voice input</td>
+</tr>
+<tr>
+<td>startRecording()</td>
+<td>Accesses microphone, records audio, auto-stops after 30 seconds</td>
+</tr>
+<tr>
+<td>transcribeAudio(blob)</td>
+<td>Sends audio to /transcribe endpoint, puts result in input box</td>
+</tr>
+<tr>
+<td>wakeAndLoad()</td>
+<td>Pings Render on page load to wake server, retries up to 5 times</td>
+</tr>
+<tr>
+<td>setInterval keep-alive</td>
+<td>Pings /sprint every 4 minutes to prevent Render from sleeping</td>
+</tr>
+</tbody>
+</table>
+<h1>Project Files</h1>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Used By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.env</td>
+<td>Stores all secret API keys and credentials — never committed to GitHub</td>
+<td>Local development only</td>
+</tr>
+<tr>
+<td>.gitignore</td>
+<td>Tells Git which files to exclude from GitHub — keeps .env safe</td>
+<td>GitHub</td>
+</tr>
+<tr>
+<td>requirements.txt</td>
+<td>Lists all Python libraries needed — flask, groq, openpyxl etc.</td>
+<td>Render (installs on deploy)</td>
+</tr>
+<tr>
+<td>Procfile</td>
+<td>Tells Render how to start the server: gunicorn server:app</td>
+<td>Render</td>
+</tr>
+</tbody>
+</table>
+<h1>Command Examples</h1>
+<h2>Sprint Status</h2>
+<table>
+<thead>
+<tr>
+<th>Command Example</th>
+<th>What AI Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>show me the sprint status</td>
+<td>Summary of sprint name, completion %, total/done/blocked counts</td>
+</tr>
+<tr>
+<td>show me sprint status, assigned to and dates</td>
+<td>Full issue list with assignees, due dates, start/end dates</td>
+</tr>
+<tr>
+<td>list all issues in this sprint</td>
+<td>Complete table of all tickets with status and assignee</td>
+</tr>
+<tr>
+<td>which issues are blocked?</td>
+<td>Filtered list of blocked tickets only</td>
+</tr>
+<tr>
+<td>which issues are in progress?</td>
+<td>Filtered list of in-progress tickets</td>
+</tr>
+<tr>
+<td>which issues are done?</td>
+<td>Filtered list of completed tickets</td>
+</tr>
+<tr>
+<td>who has the most tickets assigned?</td>
+<td>Workload breakdown per team member</td>
+</tr>
+<tr>
+<td>what is the sprint completion percentage?</td>
+<td>Completion % with done/total counts</td>
+</tr>
+<tr>
+<td>how many issues are in this sprint?</td>
+<td>Total count with breakdown by status</td>
+</tr>
+<tr>
+<td>summarise this sprint</td>
+<td>AI-written paragraph summary of sprint health</td>
+</tr>
+<tr>
+<td>which tasks are at risk?</td>
+<td>AI analysis of overdue or blocked items</td>
+</tr>
+<tr>
+<td>show me all unassigned issues</td>
+<td>List of tickets with no assignee</td>
+</tr>
+<tr>
+<td>list all high priority issues</td>
+<td>Filtered by priority field</td>
+</tr>
+<tr>
+<td>what is the sprint end date?</td>
+<td>Sprint start and end dates</td>
+</tr>
+<tr>
+<td>give me a sprint overview</td>
+<td>Full sprint health report in plain English</td>
+</tr>
+</tbody>
+</table>
+<h2>Creating Tickets</h2>
+<table>
+<thead>
+<tr>
+<th>Command Example</th>
+<th>What Happens in Jira</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>create a task called "Fix login bug" in project SCRUM</td>
+<td>New Task ticket created in selected sprint</td>
+</tr>
+<tr>
+<td>create a bug called "Dashboard not loading" in SCRUM</td>
+<td>New Bug ticket created in selected sprint</td>
+</tr>
+<tr>
+<td>create a story called "Add user authentication" in SCRUM</td>
+<td>New Story ticket created in selected sprint</td>
+</tr>
+<tr>
+<td>create a task for fixing the payment gateway</td>
+<td>AI infers project key and creates ticket</td>
+</tr>
+<tr>
+<td>add a new ticket called "Performance optimisation"</td>
+<td>New Task created in selected sprint</td>
+</tr>
+</tbody>
+</table>
+<h2>Updating Tickets</h2>
+<table>
+<thead>
+<tr>
+<th>Command Example</th>
+<th>What Happens in Jira</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mark SCRUM-1 as Done</td>
+<td>Ticket status changed to Done</td>
+</tr>
+<tr>
+<td>mark SCRUM-7 as In Progress</td>
+<td>Ticket status changed to In Progress</td>
+</tr>
+<tr>
+<td>mark SCRUM-2 as In Review</td>
+<td>Ticket status changed to In Review</td>
+</tr>
+<tr>
+<td>assign SCRUM-3 to balaji@gmail.com</td>
+<td>Ticket reassigned to specified user</td>
+</tr>
+<tr>
+<td>update SCRUM-1 summary to "New title here"</td>
+<td>Ticket title updated</td>
+</tr>
+<tr>
+<td>close SCRUM-5</td>
+<td>Ticket moved to Done status</td>
+</tr>
+</tbody>
+</table>
+<h2>Moving Tickets</h2>
+<table>
+<thead>
+<tr>
+<th>Command Example</th>
+<th>What Happens in Jira</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>move SCRUM-1 to the next sprint</td>
+<td>Ticket moved from current to next future sprint</td>
+</tr>
+<tr>
+<td>move SCRUM-7 to the active sprint</td>
+<td>Ticket moved to currently running sprint</td>
+</tr>
+<tr>
+<td>move SCRUM-1 and SCRUM-2 to next sprint</td>
+<td>Multiple tickets moved in one command</td>
+</tr>
+<tr>
+<td>move all blocked issues to next sprint</td>
+<td>AI identifies blocked tickets and moves them</td>
+</tr>
+</tbody>
+</table>
+<h2>Workload Management</h2>
+<table>
+<thead>
+<tr>
+<th>Command Example</th>
+<th>What Happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rebalance tasks across the team</td>
+<td>AI calculates average load, moves tickets from overloaded to underloaded members</td>
+</tr>
+<tr>
+<td>auto assign tasks evenly</td>
+<td>Same as rebalance — distributes workload equally</td>
+</tr>
+<tr>
+<td>who is overloaded?</td>
+<td>Displays workload analysis without making changes</td>
+</tr>
+</tbody>
+</table>
+<h2>Exporting Data</h2>
+<table>
+<thead>
+<tr>
+<th>Command Example</th>
+<th>What Happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>export to excel</td>
+<td>AI confirms and shows Download Excel button in chat</td>
+</tr>
+<tr>
+<td>download my sprint data</td>
+<td>Same as above — triggers export flow</td>
+</tr>
+<tr>
+<td>give me a spreadsheet</td>
+<td>Same as above — triggers export flow</td>
+</tr>
+<tr>
+<td>export</td>
+<td>Single word triggers export detection</td>
+</tr>
+</tbody>
+</table>
+<p>| send sprint report to manager@company.com | HTML sprint report emailed to specified address |
+| email sprint summary to balaji@gmail.com | Same — emails formatted report |
+| send report to the team at team@company.com | Report sent to team email |
+| Environment | URL |
+| --- | --- |
+| Live (deployed) | https://jirachatbotv2.netlify.app |
+| Local development | http://127.0.0.1:5500/index.html |
+| Backend API | https://your-render-url.onrender.com |
+| Feature | Our Portal | Jira Cloud App |
+| --- | --- | --- |
+| Natural language chat | ✅ Full AI chat — ask anything | ❌ Not available |
+| Sprint dashboard | ✅ Custom charts | ✅ Built-in boards |
+| Issue creation | ✅ Via AI chat command | ✅ Via forms |
+| Issue updates | ✅ Via AI chat command | ✅ Via UI clicks |
+| Sprint switching | ✅ Dropdown in portal | ✅ Board switching |
+| Resource utilisation | ✅ Auto-calculated bar chart | ⚠️ Limited view |
+| Excel export | ✅ One click with charts | ⚠️ Basic CSV only |
+| AI-powered reports | ✅ Ask AI to summarise | ❌ Not available |
+| Voice commands | ✅ Speak your commands | ❌ Not available |
+| Auto task rebalancing | ✅ AI redistributes workload | ❌ Manual only |
+| Email sprint reports | ✅ Type command to send | ❌ Manual process |
+| Agentic AI actions | ✅ AI takes actions autonomously | ❌ Not available |
+| Custom branding | ✅ Fully customisable | ❌ Fixed Atlassian UI |
+| Offline access | ✅ Cached in browser | ❌ Always needs internet |
+| Mobile app | ❌ Browser only | ✅ Native mobile app |
+| Push notifications | ❌ Not built | ✅ Built-in |
+| Full Jira features | ⚠️ Core features only | ✅ Complete |
+| Workflow management | ❌ Not built | ✅ Full workflows |
+| User management | ❌ Not built | ✅ Full admin |
+| Cost | ✅ Free / ~$10/month | 💰 Atlassian subscription |
+| Feature | Our Portal | MS Teams Jira App |
+| --- | --- | --- |
+| Works inside Teams | ❌ Separate browser tab | ✅ Native Teams tab |
+| Chat commands | ✅ Full AI natural language | ⚠️ Rule-based commands only |
+| Sprint dashboard | ✅ Charts + AI analysis | ⚠️ Basic view |
+| Create tickets via chat | ✅ Natural language | ✅ /jira command only |
+| Resource utilisation | ✅ Auto-calculated | ❌ Not available |
+| Excel export | ✅ With charts | ❌ Not built-in |
+| Teams notifications | ❌ Not built | ✅ Built-in |
+| Setup required | ✅ URL in browser | ⚠️ IT admin required |
+| Cost | ✅ Free | 💰 Atlassian licence |
+| Use Case | Best Tool |
+| --- | --- |
+| Quick sprint status check | Our Portal — type or speak the question |
+| Creating and managing detailed epics | Jira Cloud — full feature set |
+| Daily standup prep — who has what | Our Portal — Resources tab at a glance |
+| Workflow automation rules | Jira Cloud — built-in automation |
+| Sending sprint report to stakeholder | Our Portal — type 'send report to email' |
+| Mobile issue updates on the go | Jira Cloud mobile app |
+| AI analysis of sprint health | Our Portal — only option |
+| Enterprise user management | Jira Cloud — admin panel |
+| Rebalancing overloaded team members | Our Portal — auto rebalance command |
+| Agile ceremonies and planning | Jira Cloud — full planning tools |
+| Layer | Technology | Purpose | Cost |
+| --- | --- | --- | --- |
+| Frontend UI | HTML + CSS + Vanilla JS | Portal interface and charts | Free |
+| Charts | Chart.js (CDN) | Donut and bar chart rendering | Free |
+| Backend | Python Flask | API server and business logic | Free |
+| Jira Integration | Jira REST API | Read/write Jira data | Free |
+| AI Model | Groq Llama 3.3 70B | Natural language understanding and tool calling | Free |
+| Speech to Text | Groq Whisper Large v3 | Voice command transcription | Free |
+| Excel Export | openpyxl (Python) | Generate .xlsx files | Free |
+| Frontend Hosting | Netlify | Serve HTML/CSS/JS files | Free |
+| Backend Hosting | Render | Run Flask server | Free (sleeps) / $7/month |
+| Source Control | GitHub | Code storage and deployment trigger | Free |</p>
+  </main>
+</body>
+</html>

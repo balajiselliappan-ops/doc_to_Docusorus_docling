@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Docusaurus Preview</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f8fafc; color: #0f172a; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 3rem; line-height: 1.65; }
+    h1, h2, h3, h4 { line-height: 1.3; }
+    pre { background: #0b1220; color: #e2e8f0; padding: 1rem; border-radius: 10px; overflow-x: auto; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.5rem; text-align: left; }
+    th { background: #e2e8f0; }
+    mark.keyword-mark { background: #fff7cc; border: 1px solid #f59f00; padding: 0 2px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <main>
+<p>Jira Dashboard Generator
+Code Architecture &amp; Technical Documentation
+Multi-Tenant | OAuth 2.0 | MCP Tools | LangGraph + Qwen</p>
+<h2>1. Project Structure</h2>
+<p>The project consists of four main files:</p>
+<h3>2. mcp_tools.py — Jira Tool Definitions</h3>
+<p>This file defines what the AI can do with Jira. Each function decorated with <code>@tool</code> becomes a callable tool that the LLM (Qwen) can invoke during a conversation.</p>
+<h4>2.1 Available Tools</h4>
+<h4>2.2 Auth Resolver Pattern</h4>
+<p>Tools never store credentials directly. Instead, a resolver function is injected at startup:</p>
+<pre><code class="language-python">set_auth_resolver(get_jira_auth)
+</code></pre>
+<p>This means every tool call always uses the current logged-in user's OAuth token from their session — not a hardcoded API key. This is what enables multi-tenancy.</p>
+<h2>3. server.py — Main Application</h2>
+<p>This is the brain of the application. It has seven distinct sections:</p>
+<h3>3.1 Flask + OAuth Setup</h3>
+<p>Flask is initialised with a fixed secret key (critical for sessions to survive OAuth redirects). The Atlassian OAuth app is registered with authlib:</p>
+<pre><code class="language-python">app.secret_key = os.getenv('FLASK_SECRET_KEY', 'fixed-default-string')
+atlassian = oauth.register(
+    name='atlassian',
+    client_id=os.getenv('JIRA_CLIENT_ID'),
+    authorize_url='https://auth.atlassian.com/authorize',
+    access_token_url='https://auth.atlassian.com/oauth/token',
+)
+</code></pre>
+<h3>3.2 Per-User Data Isolation (Multi-Tenant)</h3>
+<p>All data is scoped to the logged-in user using a hashed user ID:</p>
+<pre><code class="language-python">_user_dashboards: Dict[str, Dict] = {}   # per-user chart store
+_user_cache:      Dict[str, Any]  = {}    # per-user Jira cache
+
+def user_id():
+    return hashlib.md5(email.encode()).hexdigest()  # stable unique ID
+
+def get_user_dashboards():
+    return _user_dashboards.get(user_id(), {})  # only THIS user's data
+</code></pre>
+<p>User A on <code>balajiselliappan.atlassian.net</code> and User B on <code>ABCCorp.atlassian.net</code> will never see each other's dashboards or cache.</p>
+<h3>3.3 Jira Auth — OAuth + API Key Fallback</h3>
+<p>Every Jira API call goes through <code>get_jira_auth()</code> which checks two sources in priority order:</p>
+<p>The auth type is logged on every call so you can always see which method is active in the terminal:</p>
+<pre><code>[OAUTH] GET search/jql      ← using OAuth token
+[APIKEY] GET search/jql     ← using .env API key
+</code></pre>
+<h3>3.4 Three-Level Intelligence System</h3>
+<p>When a user types a prompt, the system tries three levels of intelligence in order — fastest first:</p>
+<h4>Level 1 — Fast Dispatch</h4>
+<p>Directly calls Jira tools without involving the LLM. Saves 3-5 seconds per request:</p>
+<pre><code class="language-python">def fast_dispatch(prompt_lower, project_key):
+    if 'list sprint' in prompt_lower:
+        return jira_get_sprints.invoke({'project_key': project_key})
+    if 'list issue' in prompt_lower:
+        return jira_search_issues.invoke({'jql': f'project={project_key}'})
+    return None  # needs LLM
+</code></pre>
+<h4>Level 2 — MCP Agent (ReAct Loop)</h4>
+<p>The LLM is given all available tools and asked to decide which one to call:</p>
+<pre><code class="language-python"># Step 1: Ask LLM which tool to use
+response = llm.invoke([system_prompt, HumanMessage(prompt)])
+# LLM responds: {&quot;tool&quot;: &quot;jira_search_issues&quot;, &quot;args&quot;: {&quot;jql&quot;: &quot;...&quot;}}
+# Step 2: Call the tool
+result = tool_map[tool_name].invoke(tool_args)
+# Step 3: Ask LLM to format result
+final = llm.invoke([..., f'Tool returned: {result}. Give final answer.'])
+</code></pre>
+<h4>Level 3 — Chart Generation</h4>
+<p>Charts are rendered entirely in memory — no files written to disk:</p>
+<pre><code class="language-python">def generate_chart_b64(chart_type, title, labels, values):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    # ... draw pie/bar/line/metrics ...
+    buf = BytesIO()                            # in-memory buffer
+    plt.savefig(buf, format='png', dpi=150)    # save to buffer
+    plt.close()
+    return 'data:image/png;base64,' + base64.b64encode(buf.read()).decode()
+</code></pre>
+<p>The Base64 string is returned in the API response and displayed directly as an <code>&lt;img&gt;</code> tag in the browser.</p>
+<h3>3.5 OAuth Routes</h3>
+<p>The full OAuth flow uses 4 routes:</p>
+<h3>3.6 Login Required Decorator</h3>
+<p>Every app route is protected by <code>@login_required</code> which checks if the user is authenticated:</p>
+<pre><code class="language-python">def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not is_authenticated():
+            if request.is_json:
+                return jsonify({'error': 'Not authenticated'}), 401
+            return redirect('/login')   # redirect browser to login page
+        return f(*args, **kwargs)
+    return decorated
+</code></pre>
+<h3>3.7 Jira Cache</h3>
+<p>A 60-second TTL cache prevents hitting the Jira API on every single request:</p>
+<pre><code class="language-python">def jira_get_cached(path, params=None):
+    key = f'{user_id()}:{path}:{json.dumps(params)}'  # scoped per user
+    if key in _user_cache:
+        data, ts = _user_cache[key]
+        if time.time() - ts &lt; 60:           # 60 second TTL
+            logger.info(f'[CACHE HIT] {path}')
+            return data
+    data = jira_get(path, params)           # fetch fresh
+    _user_cache[key] = (data, time.time())
+    return data
+</code></pre>
+<h2>4. Complete Authentication Flow</h2>
+<h2>5. End-to-End Prompt Flow</h2>
+<p>Example: User types 'Create a pie chart showing issue status'</p>
+<h2>6. index.html — Frontend Architecture</h2>
+<p>The frontend is pure HTML + Bootstrap 5 + vanilla JavaScript. No React, no build step required.</p>
+<h3>6.1 Page Layout</h3>
+<h3>6.2 JavaScript Flow</h3>
+<p>All interactions follow the same pattern — call API, check result type, render:</p>
+<pre><code class="language-javascript">async function generateDashboard() {
+    var result = await api('/api/generate', {method:'POST', body: prompt});
+    if (result.cleared)      // 'clear all' command → remove all chart cards
+    if (result.result_type)  // Jira query → show table (sprints/issues/assignees)
+    if (result.chart_config) // chart generated → render Base64 img
+    if (result.auto_export)  // 'export to excel' → trigger file download
+    if (result.response)     // text response → show dismissable card
+}
+</code></pre>
+<h3>6.3 401 Handling</h3>
+<p>If the session expires mid-session, all API calls automatically redirect to login:</p>
+<pre><code class="language-javascript">async function api(url, opts) {
+    var res = await fetch(url, opts || {});
+    if (res.status === 401) {
+        window.location.href = '/login';  // redirect to login
+        return;
+    }
+}
+</code></pre>
+<h2>7. Environment Variables (.env)</h2>
+<h2>8. Key Design Decisions</h2>
+<h3>Table 1:</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>server.py</td>
+<td>Main Flask application — all backend logic, routes, OAuth, agent</td>
+</tr>
+<tr>
+<td>mcp_tools.py</td>
+<td>Jira MCP tool definitions — what the AI can do with Jira</td>
+</tr>
+<tr>
+<td>templates/index.html</td>
+<td>Main dashboard UI — charts, prompts, Jira tasks panel</td>
+</tr>
+<tr>
+<td>templates/login.html</td>
+<td>Login page shown to unauthenticated users</td>
+</tr>
+<tr>
+<td>templates/select_site.html</td>
+<td>Site picker for users with multiple Jira instances</td>
+</tr>
+<tr>
+<td>templates/select_project.html</td>
+<td>Project picker shown after OAuth login</td>
+</tr>
+</tbody>
+</table>
+<h3>Table 2:</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jira_search_issues(jql, max_results)</td>
+<td>Search issues using JQL — most flexible tool</td>
+</tr>
+<tr>
+<td>jira_get_sprints(project_key)</td>
+<td>List all sprints for a project board</td>
+</tr>
+<tr>
+<td>jira_get_issue(issue_key)</td>
+<td>Get full details of a specific ticket (e.g. SCRUM-12)</td>
+</tr>
+<tr>
+<td>jira_create_issue(summary, desc, ...)</td>
+<td>Create a new task/bug/story</td>
+</tr>
+<tr>
+<td>jira_update_issue(key, status, ...)</td>
+<td>Change status, assignee, or priority</td>
+</tr>
+<tr>
+<td>jira_get_project_summary(project_key)</td>
+<td>Count issues by status/assignee/priority — used for charts</td>
+</tr>
+<tr>
+<td>jira_get_my_issues(project_key)</td>
+<td>Issues assigned to the currently logged-in user</td>
+</tr>
+</tbody>
+</table>
+<h3>Table 4:</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Auth Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1st</td>
+<td>OAuth token from session (logged-in user's token)</td>
+</tr>
+</tbody>
+</table>
+<p>| 2nd | API key from .env file (fallback for local dev) |</p>
+<p>Table 5:
+| Level | When used | Speed |
+| --- | --- | --- |
+| Level 1: Fast Dispatch | Simple queries: list sprints, list issues, who is working on what | Instant — 0 LLM calls |
+| Level 2: MCP Agent | Complex queries: charts, specific JQL, multi-step tasks | 2-5 seconds — 1-3 LLM calls |
+| Level 3: Chart Generation | Any prompt with chart/pie/bar/line keywords | 1-2 seconds — matplotlib render |</p>
+<p>Table 6:
+| Route | What it does |
+| --- | --- |
+| /auth/login | Builds Atlassian URL manually, stores state in cookie, redirects user |
+| /auth/callback | Verifies state cookie, exchanges code for token, fetches cloud ID and user info |
+| /auth/logout | Clears session + user dashboards, redirects to /login |
+| /auth/status | Returns JSON: {connected, auth_type, user, project_key} |</p>
+<p>Table 8:
+| Step | What happens |
+| --- | --- |
+| 1. Visit / | Not authenticated → redirect to /login |
+| 2. /login page | User sees login card with 'Continue with Atlassian' button |
+| 3. Click button | /auth/login generates random state, stores in cookie, builds Atlassian URL |
+| 4. Atlassian | User logs in with their Atlassian account (password required after sign out) |
+| 5. /auth/callback | Verify state cookie, exchange code for access_token via POST |
+| 6. Fetch sites | GET accessible-resources to find user's Jira cloud ID and site name |
+| 7. Multiple sites? | Show /select-site page to pick which Jira instance to use |
+| 8. /select-project | Fetch and display all projects in the chosen site, user picks one |
+| 9. Dashboard | All API calls now use user's token + cloud_id + chosen project_key |
+| 10. Sign out | Session cleared + dashboards deleted → back to /login |</p>
+<p>Table 9:
+| Step | What happens |
+| --- | --- |
+| 1. Browser | POST /api/generate {prompt: 'Create a pie chart showing issue status'} |
+| 2. process_prompt() | Detects: wants_chart=True (has 'pie', 'chart'), jira_ok=True |
+| 3. Fast dispatch | Returns None — chart requests skip fast dispatch |
+| 4. run_jira_agent() | LLM decides to call jira_get_project_summary |
+| 5. Tool call | jira_get_project_summary → {status_counts: {Open:5, Done:3, InProgress:2}} |
+| 6. extract_chart_data() | Converts to {labels:[Open,Done,InProgress], values:[5,3,2]} |
+| 7. generate_chart_b64() | Matplotlib draws pie chart, saves to BytesIO, returns Base64 |
+| 8. save_user_dashboard() | Stores chart in _user_dashboards[user_id] |
+| 9. Return JSON | {chart_config: {image_base64: 'data:image/png;base64,...'}} |
+| 10. Browser | <img src='data:image/png;base64,...'> renders the chart |</p>
+<p>Table 10:
+| Section | Contents |
+| --- | --- |
+| Header | User avatar, name, site, project key, OAuth badge, Sign out |
+| Metrics row | 4 tiles: Dashboards / Charts / Jira Tasks / Exports |
+| Prompt area | Textarea + Generate button + quick buttons + example prompts |
+| Results area | Query tables (sprints/issues) + Dashboard chart cards |
+| Jira Tasks panel | Live tasks from current project with status/priority badges |</p>
+<p>Table 11:
+| Variable | Purpose |
+| --- | --- |
+| QWEN_BASE_URL | LLM API endpoint (OpenRouter or DashScope) |
+| QWEN_API_KEY | LLM API key |
+| QWEN_MODEL | Smart model for complex queries (e.g. qwen/qwen-plus) |
+| QWEN_MODEL_FAST | Fast model for simple queries (e.g. qwen/qwen-turbo) |
+| JIRA_CLIENT_ID | Atlassian OAuth app Client ID |
+| JIRA_CLIENT_SECRET | Atlassian OAuth app Client Secret |
+| JIRA_SERVER | Fallback: Jira base URL (used if OAuth not connected) |
+| JIRA_USER_EMAIL | Fallback: Atlassian account email |
+| JIRA_API_TOKEN | Fallback: Atlassian API token |
+| JIRA_PROJECT_KEY | Default project key (e.g. SCRUM) |
+| FLASK_SECRET_KEY | Session signing key (use fixed string in production) |</p>
+<p>Table 12:
+| Decision | Reason |
+| --- | --- |
+| OAuth state in cookie not session | Session cookies can be lost during Atlassian redirect; dedicated cookie is reliable |
+| Fixed secret_key | Random key on every restart invalidates sessions and breaks OAuth |
+| User ID = hashed email | Stable across sessions, never exposes raw email in memory keys |
+| Base64 charts not files | No disk I/O, no file cleanup, works in memory-only environments |
+| Fast dispatch before LLM | Saves 3-5 seconds for common queries — LLM only when needed |
+| 60s Jira cache per user | Reduces API calls, stays fresh enough for a dashboard context |
+| API key fallback | Allows development without OAuth — just add .env keys |
+| clear_user_cache on writes | Ensures fresh data after creating or updating issues |
+| Auto chart type switch | Single data point bar/line looks broken — auto-switch to metrics card |</p>
+  </main>
+</body>
+</html>
