@@ -149,3 +149,16 @@ async def upload_layout(file: UploadFile = File(...)):
         "extracted_pages": extracted_pages,
         "html_output_file": html_name,
     }
+    # ADD THIS SECTION AT THE END
+if __name__ == "__main__":
+    import uvicorn
+    
+    port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Starting server on 0.0.0.0:{port}")
+    
+    uvicorn.run(
+        app,
+        host="0.0.0.0",  # CRITICAL for Render
+        port=port,
+        log_level="info"
+    )
