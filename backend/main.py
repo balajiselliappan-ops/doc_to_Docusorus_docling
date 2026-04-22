@@ -4,7 +4,12 @@ from fastapi.staticfiles import StaticFiles
 import shutil, os
 from parser import extract_content, extract_pdf_layout_html
 from cleaner import clean_content, clean_content_pages
-from converter import to_docusaurus_markdown, to_html_page
+from converter import (
+    to_docusaurus_markdown,
+    to_html_page,
+    split_markdown_by_chapters,
+    rewrite_docling_image_paths,
+)
 
 app = FastAPI()
 
@@ -24,6 +29,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.mount("/output", StaticFiles(directory=OUTPUT_DIR), name="output")
+app.mount("/img/docs", StaticFiles(directory=os.path.join(OUTPUT_DIR, "docusaurus-assets")), name="docusaurus-img-docs")
 
 
 def _slugify_name(value):
@@ -44,7 +50,43 @@ async def upload(file: UploadFile = File(...)):
     raw, _ = extract_content(file_path)
     cleaned = clean_content(raw)
     markdown, engine = to_docusaurus_markdown(cleaned, file_path)
-    html_page = to_html_page(markdown, output_dir=".")
+    doc_slug = _slugify_name(file_stem)
+
+    markdown = rewrite_docling_image_paths(markdown, file_stem, doc_slug)
+
+    # Copy assets FIRST so they exist when HTML is generated with inlined images
+    src_assets = os.path.join(
+        UPLOAD_DIR,
+        "_docling_assets",
+        file_stem,
+        f"{file_stem}_artifacts",
+    )
+    docusaurus_assets_dir = os.path.join(OUTPUT_DIR, "docusaurus-assets", doc_slug)
+    os.makedirs(docusaurus_assets_dir, exist_ok=True)
+    if os.path.isdir(src_assets):
+        for name in os.listdir(src_assets):
+            src = os.path.join(src_assets, name)
+            dst = os.path.join(docusaurus_assets_dir, name)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
+
+    # Generate HTML with images inlined as base64 (self-contained for sharing)
+    html_page = to_html_page(
+        markdown,
+        output_dir=".",
+        img_docs_dir=os.path.join(OUTPUT_DIR, "docusaurus-assets"),
+    )
+
+    chapter_dir = os.path.join(OUTPUT_DIR, "chapters", doc_slug)
+    os.makedirs(chapter_dir, exist_ok=True)
+    chapter_files = []
+    for chapter_name, chapter_md in split_markdown_by_chapters(markdown, doc_slug):
+        chapter_path = os.path.join(chapter_dir, chapter_name)
+        with open(chapter_path, "w", encoding="utf-8") as chapter_file:
+            chapter_file.write(chapter_md)
+        chapter_files.append(f"chapters/{doc_slug}/{chapter_name}")
 
     output_name = f"{file_stem}.md"
     output_file = f"{OUTPUT_DIR}/{output_name}"
@@ -63,6 +105,9 @@ async def upload(file: UploadFile = File(...)):
         "engine": engine,
         "output_file": output_name,
         "html_output_file": html_name,
+        "chapter_files": chapter_files,
+        "chapter_count": len(chapter_files),
+        "docusaurus_assets_dir": f"docusaurus-assets/{doc_slug}",
     }
 
 

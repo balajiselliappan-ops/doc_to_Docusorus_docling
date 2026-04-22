@@ -1,0 +1,48 @@
+Document Converter for Docusaurus
+
+Implementation Summary (Completed Work)
+
+1. Objective Completed
+Implemented a working pipeline to convert PDF and DOCX files into markdown and HTML outputs, with Docusaurus-ready image paths and chapter-wise markdown exports.
+
+2. Backend Implementation Completed
+- FastAPI upload endpoints are implemented:
+	- /upload/ for markdown and HTML conversion
+	- /upload-layout/ for layout-preserved HTML (PDF)
+- Static mounts are implemented for:
+	- /uploads
+	- /output
+	- /img/docs
+- Docling-based extraction is implemented for PDF and DOCX.
+- Content cleaning is implemented to remove repeated noise and preserve meaningful lines.
+- AI markdown conversion is implemented with OpenAI-compatible provider support.
+- Pandoc CLI fallback path is present in converter flow.
+
+3. Docusaurus Output Handling Completed
+- Image link rewrite is implemented:
+	- uploads/_docling_assets/... -> /img/docs/<doc-slug>/...
+- Docusaurus asset export is implemented:
+	- output/docusaurus-assets/<doc-slug>/
+- Chapter split generation is implemented:
+	- output/chapters/<doc-slug>/01-...md, 02-...md, ...
+- Upload API response includes generated chapter metadata and asset directory metadata.
+
+4. Frontend Implementation Completed
+- Next.js upload and preview UI is implemented.
+- Markdown and HTML preview generation is implemented.
+- Download actions are implemented for markdown and webpage outputs.
+- Local preview path rewrite supports backend-served image paths.
+
+5. Table Handling Work Completed
+- Converter prompts were updated to preserve table structure.
+- Chunking logic was updated to avoid splitting markdown and HTML tables across chunks.
+- Table boundary normalization was added to reduce malformed markdown table rendering.
+
+6. Project Documentation and Dependency Work Completed
+- Root README and frontend README were updated for current project flow.
+- Backend requirements file is present with project dependencies.
+
+7. Verification Completed
+- Python compile checks were run successfully for backend modules after converter/main updates.
+- Generated markdown and chapter outputs were validated in output folders.
+- Docusaurus asset files were validated in output/docusaurus-assets.

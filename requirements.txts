@@ -1,0 +1,7 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+docling==0.10.5
+docling-core==0.3.0
+openai>=1.30.0
+markdown>=3.6

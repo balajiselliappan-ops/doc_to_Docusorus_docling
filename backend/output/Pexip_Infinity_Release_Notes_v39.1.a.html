@@ -15,493 +15,722 @@
     th, td { border: 1px solid #cbd5e1; padding: 0.5rem; text-align: left; }
     th { background: #e2e8f0; }
     mark.keyword-mark { background: #fff7cc; border: 1px solid #f59f00; padding: 0 2px; border-radius: 4px; }
+    img { display: block; max-width: 100%; height: auto; margin: 1rem auto; border-radius: 8px; }
+    p > img { margin-top: 1rem; margin-bottom: 1rem; }
+    main { overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
   <main>
-<!-- image -->
-
-<h2>Pexip Infinity v39.1</h2>
+<h1>Pexip Infinity v39.1</h1>
 <h2>Release Notes</h2>
-<p>Software Version 39.1 Document Version 39.1.a February 2026 ## Contents
-| Introduction | 3 | |—————————————————-|—–| | Upgrading to
-version 39.1 | 4 | | Upgrading from version 35 or later to version
-39.1 | 4 | | Upgrading from versions 31.4-34.2 to version 39.1 | 5
-| | Upgrading from versions 27-31.3 to version 39.1 | 5 | |
-Upgrading from versions 22-26 to version 39.1 | 5 | | New features
-and improvements in this release | 6 | | Pexip Infinity platform | 6
-| | Changes in functionality | 8 | | Changes in this release | 8
-| | Planned changes / actions required | 9 | | Issues fixed in
-version 39 | 10 | | Pexip Infinity | 10 | | Pexip Infinity | 10
-| | One-Touch Join | 10 | | Pexip web app | 10 | | Known
-limitations | 12 | | Pexip Infinity | 12 | | Pexip Teams Connector
-| 13 | | Poly/Polycom | 13 | | Microsoft | 13 | | Microsoft
-Skype for Business | 13 | | Secure Scheduler for Exchange | 14 | |
-One-Touch Join | 14 | <!-- image --> ## Introduction
-This document contains the release notes for Pexip Infinity version 39.1.
-Complete information about how to install and operate Pexip Infinity is available from the Pexip technical documentation website at
-docs.pexip.com.
-The website also contains comprehensive documentation on all aspects of deploying the Pexip Infinity platform. This includes how to
-administer and use the Pexip app suite; how to configure Pexip Infinity features such as One-Touch Join, Secure Scheduler for Exchange
-and Pexip Service; and how to integrate Pexip Infinity with other third-party systems and call control solutions including Google Meet,
-Microsoft Teams, Microsoft Skype for Business, Cisco Unified Communications Manager, Cisco VCS and Polycom DMA.
-## Management Node host server sizing information - l
-For typical deployments of up to 30
-Conferencing Nodes, you must ensure that the Management Node host server has at least
-4 vCPUs and 4 GB of RAM. - l For deployments with more than 30
-Conferencing Nodes, you will need to increase the number of cores and the amount of RAM
-on the Management Node. Please contact your Pexip authorized support representative or your Pexip Solution Architect for
-guidance on Management Node sizing specific to your environment. ##
-Upgrading to version 39.1 -
-If you are running a software version between v31.4 and v34.2 inclusive, you must first upgrade to version
-35 , and then upgrade
-again to version 39.1; see Upgrading from versions 31.4-34.2 to version 39.1.
-## Upgrading from version 35 or later to version 39.1
-When the upgrade process starts, the Management Node is upgraded first. Then up to 10 Conferencing Nodes are selected and are
-automatically placed into maintenance mode. When all calls have finished on a node that is in maintenance mode, that node is
-upgraded and then put back into active service. Another Conferencing Node is then selected, placed into maintenance mode and
-upgraded, and so on until all Conferencing Nodes have been upgraded.
-If all of the calls on a Conferencing Node that is in maintenance mode have not cleared after 1 hour, the node is taken out of
-maintenance mode and put at the back of the queue of nodes to be upgraded. A further attempt to upgrade that node will be made
-after all other nodes have been upgraded (or had upgrade attempts made). Up to 10 Conferencing Nodes may simultaneously be in
-maintenance mode or in the process of being upgraded at any one time.
-Alternatively, to avoid unpredictable system behavior due to Conferencing Nodes running conflicting software versions, you may want
-to manually put all
-of your Conferencing Nodes into maintenance mode before initiating the upgrade process. This will allow all
-existing calls to finish, but will not admit any
-new calls. You should then actively monitor your Conferencing Nodes’ status and
-manually take each node out of maintenance mode after it has been upgraded to the new software version, so that the system can
-start taking new calls again on those upgraded nodes. <!-- image -->
-If you are upgrading from versions prior to v32, you must remove any existing MD5/SHA1 certificates, except root certificates, and
-replace them with new certificates before upgrading to v32 or later. ##
-How to upgrade When upgrading, please note that: - l
-A Management Node upgrade may take a long time, potentially up to 1 hour. Do
-not reboot the Management Node under any
-circumstances. If you are concerned about the time the upgrade is taking, please contact your Pexip authorized support
-representative. - l
-There is normally no need to reboot a Conferencing Node. If a Conferencing Node appears to be stuck for over 1 hour then contact
-your Pexip authorized support representative - do not reboot the node. -
-l
-If you experience issues when upgrading, contact your Pexip authorized support representative - do
-not attempt to roll back to
-VM snapshots without first contacting them. - l
-When upgrading from version 38.x or earlier, all
-Conferencing Nodes must have completed upgrade before any nodes become
-available. If a Conferencing Node appears to have failed upgrade then contact your Pexip authorized support representative.
-To upgrade Pexip Infinity software from v35.0 or later to v39.1: 1.
-Before upgrading an on-premises deployment, we recommend that you use your hypervisor’s snapshot functionality to take a full
-VMware/Hyper-V snapshot of the Management Node. We recommend that you do
-not take a snapshot of your Conferencing
-Nodes - you can simply redeploy them from the Management Node (after it has been rolled back) in the unlikely event that this is
-required.
-Before upgrading a cloud-based deployment (Azure, AWS, GCP or Oracle), you should backup the Management Node via Pexip
-Infinity’s inbuilt mechanism ( Utilities &gt; Backup/Restore ). 2.
-Download the Pexip Infinity upgrade package for v39.1 from the Pexip download page.
-3.
-Before upgrading, ensure that all “always-on” Conferencing Nodes are powered on and are reachable (i.e. no Connectivity Loss
-errors), and are all running the same version from which you are upgrading. You do not need to power on any cloud bursting
-nodes. 4. From the Pexip Infinity Administrator interface, go to
-Utilities &gt; Upgrade . 5. Select Choose File
-and browse to the location of the upgrade package. Status - ]pexip[
-History &amp; Logs - Upgrade Upgrade package System - Platform - Call
-Control- <!-- image --> Choose File Pexip_Infinity_v20_UPGRADE_45400.tar</p>
-<!-- image -->
+<p>Software Version 39.1<br>
+Document Version 39.1.a<br>
+February 2026</p>
+<h2>Contents</h2>
+<table>
+<thead>
+<tr>
+<th>Introduction</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upgrading to version 39.1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Upgrading from version 35 or later to version 39.1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Upgrading from versions 31.4-34.2 to version 39.1</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Upgrading from versions 27-31.3 to version 39.1</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Upgrading from versions 22-26 to version 39.1</td>
+<td>5</td>
+</tr>
+<tr>
+<td>New features and improvements in this release</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Pexip Infinity platform</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Changes in functionality</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Changes in this release</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Planned changes / actions required</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Issues fixed in version 39</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pexip Infinity</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pexip Infinity</td>
+<td>10</td>
+</tr>
+<tr>
+<td>One-Touch Join</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Pexip web app</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Known limitations</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Pexip Infinity</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Pexip Teams Connector</td>
+<td>13</td>
+</tr>
+<tr>
+<td>Poly/Polycom</td>
+<td>13</td>
+</tr>
+<tr>
+<td>Microsoft</td>
+<td>13</td>
+</tr>
+<tr>
+<td>Microsoft Skype for Business</td>
+<td>13</td>
+</tr>
+<tr>
+<td>Secure Scheduler for Exchange</td>
+<td>14</td>
+</tr>
+<tr>
+<td>One-Touch Join</td>
+<td>14</td>
+</tr>
+</tbody>
+</table>
+<h2>Introduction</h2>
+<p>This document contains the release notes for Pexip Infinity version 39.1.</p>
+<p>Complete information about how to install and operate Pexip Infinity is available from the Pexip technical documentation website at <a href="https://docs.pexip.com">docs.pexip.com</a>.</p>
+<p>The website also contains comprehensive documentation on all aspects of deploying the Pexip Infinity platform. This includes how to administer and use the Pexip app suite; how to configure Pexip Infinity features such as One-Touch Join, Secure Scheduler for Exchange and Pexip Service; and how to integrate Pexip Infinity with other third-party systems and call control solutions including Google Meet, Microsoft Teams, Microsoft Skype for Business, Cisco Unified Communications Manager, Cisco VCS and Polycom DMA.</p>
+<h2>Management Node host server sizing information</h2>
+<ul>
+<li>For typical deployments of up to 30 Conferencing Nodes, you must ensure that the Management Node host server has at least 4 vCPUs and 4 GB of RAM.</li>
+<li>For deployments with more than 30 Conferencing Nodes, you will need to increase the number of cores and the amount of RAM on the Management Node. Please contact your Pexip authorized support representative or your Pexip Solution Architect for guidance on Management Node sizing specific to your environment.</li>
+</ul>
+<h2>Upgrading to version 39.1</h2>
+<ul>
+<li>If you are running a software version between v31.4 and v34.2 inclusive, you must first upgrade to version 35, and then upgrade again to version 39.1; see <a href="#upgrading-from-versions-314-342-to-version-391">Upgrading from versions 31.4-34.2 to version 39.1</a>.</li>
+</ul>
+<h2>Upgrading from version 35 or later to version 39.1</h2>
+<p>When the upgrade process starts, the Management Node is upgraded first. Then up to 10 Conferencing Nodes are selected and are automatically placed into maintenance mode. When all calls have finished on a node that is in maintenance mode, that node is upgraded and then put back into active service. Another Conferencing Node is then selected, placed into maintenance mode and upgraded, and so on until all Conferencing Nodes have been upgraded.</p>
+<p>If all of the calls on a Conferencing Node that is in maintenance mode have not cleared after 1 hour, the node is taken out of maintenance mode and put at the back of the queue of nodes to be upgraded. A further attempt to upgrade that node will be made after all other nodes have been upgraded (or had upgrade attempts made). Up to 10 Conferencing Nodes may simultaneously be in maintenance mode or in the process of being upgraded at any one time.</p>
+<p>Alternatively, to avoid unpredictable system behavior due to Conferencing Nodes running conflicting software versions, you may want to manually put all of your Conferencing Nodes into maintenance mode before initiating the upgrade process. This will allow all existing calls to finish, but will not admit any new calls. You should then actively monitor your Conferencing Nodes' status and manually take each node out of maintenance mode after it has been upgraded to the new software version, so that the system can start taking new calls again on those upgraded nodes.</p>
+<p>If you are upgrading from versions prior to v32, you must remove any existing MD5/SHA1 certificates, except root certificates, and replace them with new certificates before upgrading to v32 or later.</p>
+<h2>How to upgrade</h2>
+<p>When upgrading, please note that:</p>
+<ul>
+<li>A Management Node upgrade may take a long time, potentially up to 1 hour. Do not reboot the Management Node under any circumstances. If you are concerned about the time the upgrade is taking, please contact your Pexip authorized support representative.</li>
+<li>There is normally no need to reboot a Conferencing Node. If a Conferencing Node appears to be stuck for over 1 hour then contact your Pexip authorized support representative - do not reboot the node.</li>
+<li>If you experience issues when upgrading, contact your Pexip authorized support representative - do not attempt to roll back to VM snapshots without first contacting them.</li>
+<li>When upgrading from version 38.x or earlier, all Conferencing Nodes must have completed upgrade before any nodes become available. If a Conferencing Node appears to have failed upgrade then contact your Pexip authorized support representative.</li>
+</ul>
+<p>To upgrade Pexip Infinity software from v35.0 or later to v39.1:</p>
 <ol>
-<li>Select Continue
-. There is a short delay while the upgrade package is uploaded.
-After the upgrade package has been uploaded, you are presented with a confirmation page showing details of the existing</li>
-<li>software version and the upgrade version. 7. To proceed, select
-Start upgrade . You are taken to the Upgrade Status
-page, showing the current upgrade status of the Management Node and all Conferencing
-Nodes. This page automatically refreshes every 5 seconds. 8.
-When the upgrade completes, all nodes will show a status of
-No upgrade in progress and have the new Installed version .
-uploading the upgrade package to the Management Node again via
-Utilities &gt; Upgrade . This will skip over any nodes that have 2.
-If the upgrade process completes and there are some nodes that have failed to upgrade, you can restart the upgrade process by
-already been upgraded. 9.
-If you have Pexip CVI for Microsoft Teams you must also upgrade your associated Teams Connector deployment in Azure to the
-same version as your Pexip Infinity deployment (including minor/“dot” releases).
-Full instructions are available at https://docs.pexip.com/admin/teams_managing.htm#upgrading.
-If you are using VMware snapshots for backup purposes, we recommend that you delete those snapshots after approximately two
-weeks, providing your upgraded system is operating as expected. This is because Virtual Machines, in general, should not run with
-snapshots over time.
-For full details on upgrading Pexip Infinity, see Upgrading the Pexip Infinity platform.
-## Upgrading from versions 31.4-34.2 to version 39.1
-If you are running a software version between v31.4 and v34.2 inclusive, you must first upgrade to version
-35 , and then upgrade again to version 39.1. To do this: 1.
-Before upgrading, ensure that all “always-on” Conferencing Nodes are powered on and are reachable (i.e. no Connectivity Loss
-errors), and are all running the same version from which you are upgrading. You do not need to power on any cloud bursting
-nodes. 2. Download the Pexip Infinity v35 upgrade file. 3.
-Follow the steps outlined in Upgrading from version 35 or later to version 39.1, but when asked to
-Choose File browse to the location of the v35 upgrade file. 4.
-Verify that the upgrade has completed successfully. 5.
-Download the Pexip Infinity v39.1 upgrade file. 6.
-Follow the steps outlined in Upgrading from version 35 or later to version 39.1, and when asked to
-Choose File browse to the location of the v39.1 upgrade file. ##
-Upgrading from versions 27-31.3 to version 39.1
-If you are running a software version between v27 and v31.3 inclusive, you must first upgrade to version
-31.4 , then upgrade again to version 35
-, and then upgrade again to version 39.1.
-All previous versions listed above are available to download from the Pexip website.
-## Upgrading from versions 22-26 to version 39.1
-If you are running a software version between v22 and v26 inclusive, you must first upgrade to version
-27.4 , and then upgrade again to version 31.4
-, and then upgrade again to version 35
-, and then upgrade again to 39.1. -
-All previous versions mentioned above are available to download from the Pexip website.
-Services - Users &amp; Devices - Utilities - ##
-New features and improvements in this release
-You can go to https://docs.pexip.com/admin/whats_new.htm and follow the relevant links for more information about all of these
-features.
-This topic covers the Pexip Infinity platform; for new features in the latest release of the Pexip web app see the web app release notes.
-## Pexip Infinity platform | Feature | Description |
-|—————————————————————————————————————–|——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————|
-| Teams Connector enhancements: new authentication model with Pexip
-Infinity, trusted lobby bypass for Zoom Rooms | The Teams Connector has
-a new authentication model with Pexip Infinity due to the deprecation of
-TLS client certificates by public Certificate Authorities. All customers
-using Teams Connectors must upgrade their Pexip deployment -both the
-Pexip Infinity platform and the Pexip Teams Connector -to version 39
-before May 2026. See Changes in functionality for more information.
-Pexip’s Cloud Video Interop (CVI) integration with Microsoft Teams also
-contains the following enhancements: | | Personal conference layouts
-now a fully supported feature | Personal layouts, where a Host or Guest
-participant can choose the layout they receive without affecting the
-conference-wide layout received by other participants, is now a fully
-supported feature. Pexip web app users can now also select a personal
-layout (when enabled) via the web app. | | Hyper-V 2025 support |
-Microsoft Hyper-V 2025 is now supported. It must be deployed manually
-using the generic Management Node and Conferencing Node images. | |
-New default minimum PIN length of 6 digits | The default minimum PIN
-length for VMRs has changed from 4 digits to 6 digits. This applies to
-new installations of Pexip Infinity only. There is no impact to existing
-systems on upgrade. PINs may still be between 4-20 digits long, subject
-to the new Minimum PIN length setting in Platform &gt; Global Settings &gt;
-Service Configuration . | | In-conference timer or countdown* | You
-can set an in-conference timer or countdown clock that is displayed at
-the top of the screen to all conference participants. There are 3 types
-of timer that can be displayed: l Elapsed time since the start of the
-conference l Time remaining countdown | | Support for external media
-collection in Google Meet | There is a new “External media processing”
-in-conference indicator and associated audio announcement that is shown
-when Google Meet external media processing is active. | | Theme
-improvements: new media collection audio files and settings | There are
-several updates to themes in support of the new external media
-collection indicators for Google Meet: l New audio files:
-conf-external-media-processing-start_48kHz_mono.wav and conf-external-
-media-processing-stopped_48kHz_mono.wav . l New fields in the
-themeconfig.json file: “disable_external_media_proc_indicator” and
-“external_ | | Feature | Description |
-|——————————————————————————————————————–|———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————|
-| Customizable registration SSO timeout | For SAML Identity Providers
-that do not support the SessionNotOnOrAfter attribute for customizing
-session timeouts (such as Microsoft Entra ID), there is now support for
-an alternative SessionDuration custom attribute. | | Administrative
-improvements: vendor details for registered devices; upload progress
-bar, changing order of aliases | This release contains the following
-administrative improvements: l The registration status and registration
-history pages now include vendor information for the registered device.
-l All cosmetic references to Microsoft Lync have been removed from the
-Administrator interface, and thus all labels and messages now refer to
-only Microsoft Skype for Business / SfB. l When uploading an upgrade
-package, Administrators are now presented with a progress bar. l When
-configuring a service with multiple aliases, administrators can now
-change the order in which the list of aliases appears. | ##
-Changes in functionality
-This topic covers the Pexip Infinity platform; for changes in the latest release of the web app see the web app release notes.
-## Changes in this release | Feature | Description |
-|————————————————–|———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————|
-| Deprecation of TLS client certificates by public | Public
-Certificate Authorities are stopping issuing certificates with client
-authentication EKU (Extended Key Usage) capabilities, due to a change in
-web browser trusted CA policy. By May 2026, it will be impossible to |
-| Certificate Authorities | acquire new certificates with both client
-and server authentication EKUs from public CAs. | | | Prior to
-version 39, certificates with client authentication capabilities were
-required for communicating with the Teams Connector. This requirement
-has been removed in v39 (see below), and therefore, certificates with
-client authentication capabilities are now typically not required in
-most Pexip Infinity deployments. However, in advanced scenarios your
-Conferencing Nodes’ certificates may require a client authentication EKU
-when responding to SIP/TLS client certificate challenges. | | |
-Therefore if your environment requires your Conferencing Node
-certificates to have client (and server) EKU then you will need to
-manage this in the future through your own private Certificate
-Authority. | | | Version 39 of Pexip Infinity contains the following
-related changes: | | | l When configuring a Conferencing Node there
-is a new optional Client TLS certificate setting that may be assigned.
-This is the TLS certificate to use on this node when responding to
-SIP/TLS client certificate challenges. | | | If your deployment
-receives SIP/TLS client certificate challenges then you must assign an
-appropriate Client TLS certificate to your Conferencing Nodes after
-upgrading to version 39. | | | l When generating a CSR (Certificate
-Signing Request), only server authentication EKU is now requested by
-default. You can optionally also request client authentication EKU.
-Previously all CSRs requested server and client EKU. | | | Teams
-Connector integrations | | | Customers who use Pexip’s Teams
-Connector will be affected by this change to EKU: | | | l In version
-38 and earlier, a Teams Connector deployment used TLS certificates with
-both server and client capabilities for validating device identities
-(Pexip Infinity nodes and Teams Connectors), known as mutual TLS. | |
-| l Version 39 and later uses a new authentication model that does not
-use mutual TLS. This means that the TLS certificates on Pexip Infinity
-nodes and Teams Connectors are no longer required to have client
-capabilities. | | | All customers using Teams Connectors must upgrade
-to v39 before May 2026. | | | From version 39 onwards, only the
-following key types are supported in the certificate that is installed
-on Conferencing Nodes that are used to communicate with a Teams
-Connector: l | | | RSA | | | l ECDSA with the following NIST
-curves: | | | o P-256 | | | o P-384 | | | o P-521 | | | Note
-that the certificate installed on your Teams Connectors must use RSA
-keys only. | | | Skype for Business deployments | | | Integrations
-with Microsoft Skype for Business require the use of client
-certificates, and therefore you must assign an appropriate Client TLS
-certificate to your Conferencing Nodes after upgrading to version 39. |
-## Planned changes / actions required | Feature | Description |
-|—————————————————————————————–|————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————–|
-| OTJ: Microsoft Teams domain change | In Q1 2026 Microsoft will start
-transitioning Teams links from teams.microsoft.com to
-teams.cloud.microsoft . One- Touch Join will automatically support
-invitations using teams.cloud.microsoft after upgrading to v39 , but if
-you use any custom rules that use teams.microsoft.com , you must update
-them manually to use the new format. | | Deprecation of insecure
-transport for LDAP | The Allow insecure transport option for LDAP
-integrations (available when configuring LDAP sync sources and LDAP-
-based authentication for the Administrator interface) is being
-deprecated and will be removed in a future release. Customers should
-migrate to TLS-based LDAP integration. | | Remove support for VMware
-ESXi 6.7 | Support for VMware ESXi 6.7 will be removed in a future
-release. When this occurs, Pexip will support VMware installation on
-ESXi 7.0 and 8.0. | | Remove support for AVX | In 2027 we intend to
-cease support for the AVX instruction set on Pexip Infinity Conferencing
-Nodes. AVX2 and AVX512 will continue to be supported. This means that
-any Conferencing Nodes based on Intel Sandy Bridge or Ivy Bridge will
-cease to work. These parts were last sold in 2015 and Intel ended
-support in 2020. Any newer hardware that has been deployed with a VMware
-virtual hardware revision older than 11 will need to be updated to a
-newer virtual hardware revision. | | Use of application impersonation
-in One-Touch Join and Secure Scheduler for Exchange | In a future
-release we will remove the OAuth (delegate access with a service
-account) Authentication method option when configuring a Secure
-Scheduler for Exchange Integration. This is because from February 2025
-Microsoft disabled Application Impersonation role assignments to service
-accounts (for more information, see Microsoft’s announcement).
-Therefore: l One-Touch Join customers using O365 with an OTJ Exchange
-Integration must migrate to using Graph API instead. For full
-instructions, see Migrating from EWS API to Graph API for One-Touch
-Join. l Secure Scheduler for Exchange customers still using O365 with a
-service account to access equipment resources and mailboxes must migrate
-to using app permissions instead. For full instructions, see Configuring
-Office 365 for | | Secure Scheduler for Exchange: deprecation of
-{{start_time}} and {{end_time}} variables | In a future release we will
-remove the {{start_time}} and {{end_time}} variables from the following
-Secure Scheduler for Exchange jinja2 template fields: l Accept new
-single meeting template l Accept edited single meeting template l Accept
-new recurring meeting template l Accept edited occurrence template l
-Accept edited recurring meeting template | | Deprecation of
-password-based authentication for the Teams Connector CVI |
-Certificate-based authentication (CBA) is now the default method to
-authenticate the Teams Connector CVI application towards MS Graph. You
-can still use the previous password-based authentication method, but we
-plan to deprecate it in a future release, thus we recommend using CBA
-for new installations, or migrating to CBA as soon as practicable when
-upgrading existing deployments. | | Deprecation of v1 legacy themes |
-We plan to deprecate legacy style”version 1” themes in a future release.
-If you still use v1 themes you should plan to move to using “version 2”
-themes instead, which have been available since version 18 of Pexip
-Infinity. | | Deprecation of Webapp2 | Webapp2 is being deprecated,
-and from January 2027 will no longer be included with Pexip Infinity. If
-this will impact your deployment, please contact your Pexip authorized
-support representative. | ## Issues fixed in version 39 ##
-Pexip Infinity | Ref # | Resolution |
-|———|————————————————————————————————————————————————————| | 47585
-| Resolved an issue in v39.0 in deployments with multiple custom themes
-that could cause the wrong watermark to be displayed. | | 47170 |
-Resolved an issue where classification indicators could not be set via
-the Client API with a call using a Proxying Edge Node. | | 44858 |
-Resolved an issue in a gateway call using an Adaptive Composition or
-Teams-like layout, where content classifications and banner messages
-were not shown. | | 44427 | Resolved an issue that in some cases
-caused multiple participants to be created when a call was de-escalated
-from being transcoded to a direct media call. | ## Pexip Infinity |
-Ref # | Resolution |
-|———|————————————————————————————————————————————————————————————–|
-| 46323 | Resolved an issue where with two participants visible in the
-1+33 layout, one may not be visible in HD resolution. | | 46251 |
-Resolved an issue where some WebRTC packets may exceed the configured
-network MTU. | | 45680 | For Breakout rooms, using local policy
-together with external policy no longer causes calls to fail. | |
-45393 | When one participant in a direct media call disconnects
-“uncleanly” (e.g. by closing their laptop lid before ending the call),
-the other participant’s call is no longer terminated. | | 45238 |
-Resolved an issue where major scene changes could lead to short-term
-bandwidth usage that exceeded the configured maximum. | ##
-One-Touch Join | Ref # | Resolution |
-|———|——————————————————————————————————————————————————————————| |
-46232 | OTJ now supports Microsoft Teams meeting invitations that use
-the new teams.cloud.microsoft and teams.usgovcloud.microsoft domains,
-which are being rolled out by Microsoft. | | 46072 | A Host header is
-now included in requests to a web proxy, to comply with RFC 2616. | ##
-Pexip web app | Ref # | Resolution |
-|————-|—————————————————————————————————————————————————————————-| |
-46172 | When a participant join a meeting using a preconfigured URL
-that includes join=1 , they are only asked to enter their name if they
-have not previously provided it. | | 46060 | When a Host participant
-is in a breakout room, the Mute participants , Allow/disallow
-participants to unmute and Disconnect all participants options now work
-as expected. | | 46034 | Resolved an issue whereby a breakout room
-added from the Edit rooms option did not save. | | 46024 36674 |
-Resolved an issue that caused certain headsets with a hardware mute
-capability (including Jabra headsets) to appear muted when they were
-not. | | Ref # | Resolution |
-|————-|———————————————————————————————————————————————————————————————————————————————————————————-|
-| 46010 42368 | Resolved issues with Chrome and Edge browsers on
-Windows devices that caused a portrait layout to be used or remain
-active when the aspect ratio no longer required it. | | 45824 | If a
-participant uses the space bar to temporarily unmute and at the same
-time changes focus to another window, then releases the space bar, they
-will no longer erroneously see the “You’re temporarily unmuted” toast
-message when switching focus back to the web app window. | | 45558 |
-Resolved an issue that caused clipping or distortion of the audio from
-participants joining on iOS devices via Safari when using bluetooth
-earbuds. | | 45547 | When a VMR transitions from direct media to
-transcoded or vice versa, the “All Guests unmuted by Host” toast is no
-longer erroneously shown. | | 44204 | Users with 1Password’s Chrome
-extension installed no longer see a “Save login” popup when interacting
-with some UI buttons. | | 2207 | When Mute all guests has been
-selected and Allow Guests to unmute is disabled, Guests can no longer
-unmute themselves using the m keyboard shortcut or the Mute button in
-the self view window. | | 2147 | Resolved an issue experienced by
-Safari users when joining using the step-by-step flow that caused noise
-to be heard during the speaker and microphone checking steps. | | 2139
-| A title is now shown for widgets that appear in the toolbar. | ##
-Known limitations ## Pexip Infinity | Ref # | Limitation |
-|———|——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————–|
-| 46568 | Outbound calls to RTMP participants that cannot be reached
-remain in a “connecting” state and do not disconnect cleanly when the
-TCP connection times out. | | 46353 | The configured Guests-only
-timeout and Last participant backstop timeout do not apply to direct
-media calls, meaning these calls are not automatically disconnected when
-only one participant remains. | | 42379 | The time-based conference
-media statistics / graphs introduced in version 36.0 are not present in
-version 36.1 and later when reviewing participant / conference history
-in the Administrator interface. | | 30756 | Under certain
-circumstances, when a Conferencing Node is handling calls that include
-presentation, the observed media load may exceed 100%. | | 27534 | A
-Pexip app that is paired to another video device (such as a SIP
-endpoint) cannot be used to connect to a Media Playback Service. | |
-24607 | Changes to cloud bursting configuration may result in an
-administrator.configuration log message that GCP private key
-configuration was changed even when it was not. | | 24424 | Only 3 of
-the assigned DNS servers will be used by the Management Node or by a
-Conferencing Node (as configured in its associated system location). |
-| 19176 | Changing the IP address of the Management Node and then
-manually rebooting before completing the installation wizard may result
-in failed connectivity to Conferencing Nodes. To work around this, you
-must ensure that you re-run and fully complete the installation wizard
-after changing the Management Node configuration. | | 16232 | The
-Call-id is not logged on an administrative event when a Guest joins a
-conference and all Guests are muted. | | 16119 | “License limit
-reached” alarms are not lowered as expected, even though an appropriate
-“Alarm lowered” message is logged. | | 15943 | “Connectivity lost
-between nodes” alarms are not recorded in the alarm history ( History &amp;
-Logs &gt; Alarm History ). | | 13305 | The G.719 codec is not currently
-supported for SIP. | | 12218 | In some call scenarios that take a
-long time for the call setup to complete (for example calls that involve
-ICE, a Conferencing Node behind static NAT, and where the client is also
-behind a NAT) any audio prompts (such as requests to enter a PIN) may be
-played too early and the client may not hear all of the message. | |
-7906 | If a caller dials into a Virtual Reception and enters the number
-of the conference they want to join, but there are insufficient hardware
-resources available to join the caller to that conference, the caller is
-disconnected from the Virtual Reception. | | 6739 | Any changes made
-to VMR configuration -such as updating the participant limit -while the
-conference is ongoing do not take immediate effect, and may result in
-conference separation (i.e. new participants will join a separate VMR
-from those that are currently connected). All participants must
-disconnect from the conference for the change to take effect. | | 5601
-| When changing the certificates in a chain, a reboot of the associated
-Conferencing Nodes may be required if the changes do not produce the
-desired effect. | ## Pexip Teams Connector | Ref # | Limitation |
-|———|———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————|
-| 35285 | Participants connected via Azure Communication Services
-(ACS) will not see video from participants joining via CVI as “trusted”.
-We are working with Microsoft to address the issue that these
-participants are filtered out. A temporary workaround is to configure
-your system so that CVI participants connect as normal/untrusted guests,
-and ensure that someone admits them from the lobby. Please contact your
-Pexip authorized support representative for assistance and refer to
-issue #35285. | | 34367 | A Microsoft Teams Room that joins a VMR as
-a Guest is not treated as a Guest. For example, it will not be muted if
-“mute all Guests” is triggered. | | 27854 | In a large Teams meeting
-you may see a discrepancy in the participant count on Pexip versus that
-which is reported on the Teams side. We are working with Microsoft to
-resolve this. | ## Poly/Polycom | Ref # | Limitation |
-|———|————————————————————————————————————————————————————————————————————————————————————————–|
-| 13541 | When a Polycom Trio is registered to Skype for Business, and
-has dialed in to Pexip Infinity, it will receive presentation as main
-video from Pexip Infinity. However, when the same endpoint is dialed out
-to from Pexip Infinity, it will receive presentation as RDP. | ##
-Microsoft ## Microsoft Skype for Business | Ref # | Limitation |
-|———|———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————–|
-| 46066 | When a Skype for Business user shares a window and then
-partially covers the window by dragging another app over the top,
-participants connected via Pexip Infinity may see a black area partially
-covering the shared content, and the content may decrease in size. As a
-workaround, the Skype for Business user should keep the shared window
-fully in the foreground, or use the ‘Share Desktop’ option instead. |
-| 45244 | When a Skype for Business user shares a PowerPoint using the
-“Present PowerPoint’ method, other participants in the call may not
-receive the presentation. As a workaround, the Skype for Business user
-can use the ‘Share Desktop’ or ‘Share Program’ options. | | 17210 |
-RDP presentation content from a Skype for Business meeting may sometimes
-take several seconds to render on VTC devices that are gatewayed into
-that meeting. One workaround is to use Video-based Screen Sharing (VbSS)
-instead of RDP for content sharing. If you must use RDP then you can
-configure your system to adjust the bandwidth used for RDP presentation
-which will reduce the delay in rendering the RDP content for the VTC
-device -contact your Pexip authorized support representative for
-configuration details. | | 13201 | When a Skype for Business client
-is presenting PowerPoint slides in a Skype for Business meeting,
-sometimes only the first slide is sent to standards-based endpoints that
-are gatewayed into that meeting. | | 5100 | If a Conferencing Node
-being used as a gateway into a SfB meeting is near processor capacity
-and another endpoint in the SfB meeting starts sending content, a
-participant may be inadvertently disconnected from the conference. To
-resolve this, the endpoint can dial back into the conference. | | 4926
-| Participants calling into Skype for Business through the Infinity
-Gateway may experience inconsistent call rejection messages if a
-Conferencing Node is placed into maintenance mode. | | Ref # |
-Limitation |
-|———|————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————-|
-| 4812 | In some instances, one of two messages sent to a VMR from two
-SfB clients not previously connected may not be properly retained by the
-VMR. To resolve, re-send the message. | | 4195 | Participants
-connected via the Infinity Gateway into a SfB meeting may not receive
-presentation content from SfB participants. This occurs if the SfB user
-has a screen resolution where the width is an odd number of pixels, such
-as a resolution of 1437x758. If this occurs, one workaround is for the
-user to share an application rather than their full desktop. | ##
-Secure Scheduler for Exchange | Ref # | Limitation |
-|———|———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————–|
-| 42882 | When editing a recurring meeting, the option to edit This
-and all following events is not supported. You must instead choose to
-edit All events in the series . | | 19530 | When using Microsoft’s
-OWAwith Office 365 account, join instructions that use the <style>
-element will not be added, even though the”Success” message is displayed
-to the user. | | 16602 | In some circumstances, users are not able to
-obtain a VMR for a meeting if an existing meeting invitation is being
-edited and has previously had a VMR assigned. This may happen if a user
-has previously activated the add-in when editing an invitation but then
-discarded their changes, or if the user has removed the information
-added to the invitation when the add-in was previously activated. By
-default, users will see a message “VMR already assigned”. | ##
-One-Touch Join | Ref # | Limitation |
-|———|———————————————————————————————————-| | 32706 | Poly Trio
-endpoints running software version 7.x do not display meeting reminders
-or join notifications. |</li>
+<li>Before upgrading an on-premises deployment, we recommend that you use your hypervisor's snapshot functionality to take a full VMware/Hyper-V snapshot of the Management Node. We recommend that you do not take a snapshot of your Conferencing Nodes - you can simply redeploy them from the Management Node (after it has been rolled back) in the unlikely event that this is required.</li>
 </ol>
+<p>Before upgrading a cloud-based deployment (Azure, AWS, GCP or Oracle), you should backup the Management Node via Pexip Infinity's inbuilt mechanism (Utilities &gt; Backup/Restore).</p>
+<ol>
+<li>
+<p>Download the Pexip Infinity upgrade package for v39.1 from the Pexip download page.</p>
+</li>
+<li>
+<p>Before upgrading, ensure that all "always-on" Conferencing Nodes are powered on and are reachable (i.e. no Connectivity Loss errors), and are all running the same version from which you are upgrading. You do not need to power on any cloud bursting nodes.</p>
+</li>
+<li>
+<p>From the Pexip Infinity Administrator interface, go to Utilities &gt; Upgrade.</p>
+</li>
+<li>
+<p>Select Choose File and browse to the location of the upgrade package.</p>
+</li>
+</ol>
+<p>Status -
+]pexip[
+History &amp; Logs -
+Upgrade
+Upgrade package
+System -
+Platform - Call Control-
+<img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000003_b50a20bca6b97386ab4df2d64a811efcb960cd9cd35cffdc5eec5fdb7eb61a60.png">
+Choose File Pexip_Infinity_v20_UPGRADE_45400.tar
+<img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000004_97545d1fe895e9915e9eb6a7550cec698c08d8f56148845948e00b0c9af6a9b7.png"></p>
+<ol>
+<li>
+<p>Select Continue. There is a short delay while the upgrade package is uploaded. After the upgrade package has been uploaded, you are presented with a confirmation page showing details of the existing software version and the upgrade version.</p>
+</li>
+<li>
+<p>To proceed, select Start upgrade. You are taken to the Upgrade Status page, showing the current upgrade status of the Management Node and all Conferencing Nodes. This page automatically refreshes every 5 seconds.</p>
+</li>
+<li>
+<p>When the upgrade completes, all nodes will show a status of No upgrade in progress and have the new Installed version. uploading the upgrade package to the Management Node again via Utilities &gt; Upgrade. This will skip over any nodes that have already been upgraded.</p>
+</li>
+<li>
+<p>If you have Pexip CVI for Microsoft Teams you must also upgrade your associated Teams Connector deployment in Azure to the same version as your Pexip Infinity deployment (including minor/"dot" releases). Full instructions are available at <a href="https://docs.pexip.com/admin/teams_managing.htm#upgrading">https://docs.pexip.com/admin/teams_managing.htm#upgrading</a>.</p>
+</li>
+</ol>
+<p>If you are using VMware snapshots for backup purposes, we recommend that you delete those snapshots after approximately two weeks, providing your upgraded system is operating as expected. This is because Virtual Machines, in general, should not run with snapshots over time.</p>
+<p>For full details on upgrading Pexip Infinity, see Upgrading the Pexip Infinity platform.</p>
+<h2>Upgrading from versions 31.4-34.2 to version 39.1</h2>
+<p>If you are running a software version between v31.4 and v34.2 inclusive, you must first upgrade to version 35, and then upgrade again to version 39.1. To do this:</p>
+<ol>
+<li>
+<p>Before upgrading, ensure that all "always-on" Conferencing Nodes are powered on and are reachable (i.e. no Connectivity Loss errors), and are all running the same version from which you are upgrading. You do not need to power on any cloud bursting nodes.</p>
+</li>
+<li>
+<p>Download the Pexip Infinity v35 upgrade file.</p>
+</li>
+<li>
+<p>Follow the steps outlined in Upgrading from version 35 or later to version 39.1, but when asked to Choose File browse to the location of the v35 upgrade file.</p>
+</li>
+<li>
+<p>Verify that the upgrade has completed successfully.</p>
+</li>
+<li>
+<p>Download the Pexip Infinity v39.1 upgrade file.</p>
+</li>
+<li>
+<p>Follow the steps outlined in Upgrading from version 35 or later to version 39.1, and when asked to Choose File browse to the location of the v39.1 upgrade file.</p>
+</li>
+</ol>
+<h2>Upgrading from versions 27-31.3 to version 39.1</h2>
+<p>If you are running a software version between v27 and v31.3 inclusive, you must first upgrade to version 31.4, then upgrade again to version 35, and then upgrade again to version 39.1.</p>
+<p><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000005_465f55b4047e54c3ab0a3fd95331246eb0ce1b246a84e2694ac95f59641d1a28.png"></p>
+<p>All previous versions listed above are available to download from the Pexip website.</p>
+<h2>Upgrading from versions 22-26 to version 39.1</h2>
+<p>If you are running a software version between v22 and v26 inclusive, you must first upgrade to version 27.4, and then upgrade again to version 31.4, and then upgrade again to version 35, and then upgrade again to 39.1.</p>
+<p><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000006_b95c23759014e510238e56dcb92aa2cc26055afd343bb4698ea73165423505f3.png"></p>
+<ul>
+<li>All previous versions mentioned above are available to download from the Pexip website.</li>
+</ul>
+<p>Services -
+Users &amp; Devices -
+Utilities -
+<img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000007_407670945a5a331520474225eae3384c302991deb4c746986407667fdc2df566.png"></p>
+<h2>New features and improvements in this release</h2>
+<p>You can go to <a href="https://docs.pexip.com/admin/whats_new.htm">https://docs.pexip.com/admin/whats_new.htm</a> and follow the relevant links for more information about all of these features.</p>
+<p>This topic covers the Pexip Infinity platform; for new features in the latest release of the Pexip web app see the web app release notes.</p>
+<h2>Pexip Infinity platform</h2>
+<p><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000008_dc39a1f49967f0ccdc70a284fa4a9fb9754b5eb82e4f478a2ec31828fc0d1857.png"></p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Feature</td>
+<td>Description</td>
+</tr>
+</tbody>
+</table>
+<h1>Teams Connector enhancements: new authentication model with Pexip Infinity, trusted lobby bypass for Zoom Rooms</h1>
+<p>The Teams Connector has a new authentication model with Pexip Infinity due to the deprecation of TLS client certificates by public Certificate Authorities. All customers using Teams Connectors must upgrade their Pexip deployment - both the Pexip Infinity platform and the Pexip Teams Connector - to version 39 before May 2026. See Changes in functionality for more information. Pexip's Cloud Video Interop (CVI) integration with Microsoft Teams also contains the following enhancements:</p>
+<h2>Personal conference layouts now a fully supported feature</h2>
+<p>Personal layouts, where a Host or Guest participant can choose the layout they receive without affecting the conference-wide layout received by other participants, is now a fully supported feature. Pexip web app users can now also select a personal layout (when enabled) via the web app.</p>
+<h2>Hyper-V 2025 support</h2>
+<p>Microsoft Hyper-V 2025 is now supported. It must be deployed manually using the generic Management Node and Conferencing Node images.</p>
+<h2>New default minimum PIN length of 6 digits</h2>
+<p>The default minimum PIN length for VMRs has changed from 4 digits to 6 digits. This applies to new installations of Pexip Infinity only. There is no impact to existing systems on upgrade. PINs may still be between 4-20 digits long, subject to the new Minimum PIN length setting in Platform &gt; Global Settings &gt; Service Configuration.</p>
+<h2>In-conference timer or countdown*</h2>
+<p>You can set an in-conference timer or countdown clock that is displayed at the top of the screen to all conference participants. There are 3 types of timer that can be displayed:</p>
+<ul>
+<li>Elapsed time since the start of the conference</li>
+<li>Time remaining countdown</li>
+</ul>
+<h2>Support for external media collection in Google Meet</h2>
+<p>There is a new "External media processing" in-conference indicator and associated audio announcement that is shown when Google Meet external media processing is active.</p>
+<h2>Theme improvements: new media collection audio files and settings</h2>
+<p>There are several updates to themes in support of the new external media collection indicators for Google Meet:</p>
+<ul>
+<li>New audio files: <code>conf-external-media-processing-start_48kHz_mono.wav</code> and <code>conf-external-media-processing-stopped_48kHz_mono.wav</code>.</li>
+<li>New fields in the <code>themeconfig.json</code> file: <code>"disable_external_media_proc_indicator"</code> and <code>"external_</code></li>
+</ul>
+<p><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000009_b50a20bca6b97386ab4df2d64a811efcb960cd9cd35cffdc5eec5fdb7eb61a60.png"></p>
+<h2>Feature</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Customizable registration SSO timeout</td>
+<td>For SAML Identity Providers that do not support the <code>SessionNotOnOrAfter</code> attribute for customizing session timeouts (such as Microsoft Entra ID), there is now support for an alternative <code>SessionDuration</code> custom attribute.</td>
+</tr>
+</tbody>
+</table>
+<h1>Administrative improvements: vendor details for registered devices; upload progress bar, changing order of aliases</h1>
+<p>This release contains the following administrative improvements:<br>
+- The registration status and registration history pages now include vendor information for the registered device.<br>
+- All cosmetic references to Microsoft Lync have been removed from the Administrator interface, and thus all labels and messages now refer to only Microsoft Skype for Business / SfB.<br>
+- When uploading an upgrade package, Administrators are now presented with a progress bar.<br>
+- When configuring a service with multiple aliases, administrators can now change the order in which the list of aliases appears.  </p>
+<h2>Changes in functionality</h2>
+<p>This topic covers the Pexip Infinity platform; for changes in the latest release of the web app, see the web app release notes.</p>
+<h2>Changes in this release</h2>
+<p><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000010_901c999079f3b5b95de62e5156e373c7b4dbcc1db30ce31c5ddc1d0f37ba87fc.png"></p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deprecation of TLS client certificates by public</td>
+<td>Public Certificate Authorities are stopping issuing certificates with client authentication EKU (Extended Key Usage) capabilities, due to a change in web browser trusted CA policy. By May 2026, it will be impossible to</td>
+</tr>
+<tr>
+<td>Certificate Authorities</td>
+<td>acquire new certificates with both client and server authentication EKUs from public CAs.</td>
+</tr>
+<tr>
+<td></td>
+<td>Prior to version 39, certificates with client authentication capabilities were required for communicating with the Teams Connector. This requirement has been removed in v39 (see below), and therefore, certificates with client authentication capabilities are now typically not required in most Pexip Infinity deployments. However, in advanced scenarios your Conferencing Nodes' certificates may require a client authentication EKU when responding to SIP/TLS client certificate challenges.</td>
+</tr>
+<tr>
+<td></td>
+<td>Therefore if your environment requires your Conferencing Node certificates to have client (and server) EKU then you will need to manage this in the future through your own private Certificate Authority.</td>
+</tr>
+<tr>
+<td></td>
+<td>Version 39 of Pexip Infinity contains the following related changes:</td>
+</tr>
+<tr>
+<td></td>
+<td>- When configuring a Conferencing Node there is a new optional Client TLS certificate setting that may be assigned. This is the TLS certificate to use on this node when responding to SIP/TLS client certificate challenges.</td>
+</tr>
+<tr>
+<td></td>
+<td>If your deployment receives SIP/TLS client certificate challenges then you must assign an appropriate Client TLS certificate to your Conferencing Nodes after upgrading to version 39.</td>
+</tr>
+<tr>
+<td></td>
+<td>- When generating a CSR (Certificate Signing Request), only server authentication EKU is now requested by default. You can optionally also request client authentication EKU. Previously all CSRs requested server and client EKU.</td>
+</tr>
+</tbody>
+</table>
+<h1>Teams Connector integrations</h1>
+<p>Customers who use Pexip's Teams Connector will be affected by this change to EKU:</p>
+<ul>
+<li>In version 38 and earlier, a Teams Connector deployment used TLS certificates with both server and client capabilities for validating device identities (Pexip Infinity nodes and Teams Connectors), known as mutual TLS.</li>
+<li>Version 39 and later uses a new authentication model that does not use mutual TLS. This means that the TLS certificates on Pexip Infinity nodes and Teams Connectors are no longer required to have client capabilities.</li>
+<li>All customers using Teams Connectors must upgrade to v39 before May 2026.</li>
+</ul>
+<p>From version 39 onwards, only the following key types are supported in the certificate that is installed on Conferencing Nodes that are used to communicate with a Teams Connector:</p>
+<ul>
+<li>RSA</li>
+<li>ECDSA with the following NIST curves:</li>
+<li>P-256</li>
+<li>P-384</li>
+<li>P-521</li>
+</ul>
+<p>Note that the certificate installed on your Teams Connectors must use RSA keys only.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Skype for Business deployments</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>Integrations with Microsoft Skype for Business require the use of client certificates, and therefore you must assign an appropriate Client TLS certificate to your Conferencing Nodes after upgrading to version 39.</td>
+</tr>
+<tr>
+<td><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000011_7abaa7f6f2cf43920b114c1aca143b3228442208df7621efa7e314dbffcce634.png"></td>
+<td></td>
+</tr>
+<tr>
+<td><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000012_50c87a7453c9b35ef3f8004ab66e7c49b3f281f52ce88ea52cf2901c31016c93.png"></td>
+<td></td>
+</tr>
+<tr>
+<td>## Planned changes / actions required</td>
+<td></td>
+</tr>
+<tr>
+<td>Feature</td>
+<td>Description</td>
+</tr>
+<tr>
+<td>-----------------------------------------------------------------------------------------</td>
+<td>--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</td>
+</tr>
+<tr>
+<td>OTJ: Microsoft Teams domain change</td>
+<td>In Q1 2026 Microsoft will start transitioning Teams links from teams.microsoft.com to teams.cloud.microsoft . One- Touch Join will automatically support invitations using teams.cloud.microsoft after upgrading to v39 , but if you use any custom rules that use teams.microsoft.com , you must update them manually to use the new format.</td>
+</tr>
+<tr>
+<td>Deprecation of insecure transport for LDAP</td>
+<td>The Allow insecure transport option for LDAP integrations (available when configuring LDAP sync sources and LDAP- based authentication for the Administrator interface) is being deprecated and will be removed in a future release. Customers should migrate to TLS-based LDAP integration.</td>
+</tr>
+<tr>
+<td>Remove support for VMware ESXi 6.7</td>
+<td>Support for VMware ESXi 6.7 will be removed in a future release. When this occurs, Pexip will support VMware installation on ESXi 7.0 and 8.0.</td>
+</tr>
+<tr>
+<td>Remove support for AVX</td>
+<td>In 2027 we intend to cease support for the AVX instruction set on Pexip Infinity Conferencing Nodes. AVX2 and AVX512 will continue to be supported. This means that any Conferencing Nodes based on Intel Sandy Bridge or Ivy Bridge will cease to work. These parts were last sold in 2015 and Intel ended support in 2020. Any newer hardware that has been deployed with a VMware virtual hardware revision older than 11 will need to be updated to a newer virtual hardware revision.</td>
+</tr>
+</tbody>
+</table>
+<p>| Use of application impersonation in One-Touch Join and Secure Scheduler for Exchange    | In a future release we will remove the OAuth (delegate access with a service account) Authentication method option when configuring a Secure Scheduler for Exchange Integration. This is because from February 2025 Microsoft disabled Application Impersonation role assignments to service accounts (for more information, see Microsoft's announcement). Therefore: l One-Touch Join customers using O365 with an OTJ Exchange Integration must migrate to using Graph API instead. For full instructions, see Migrating from EWS API to Graph API for One-Touch Join. l Secure Scheduler for Exchange customers still using O365 with a service account to access equipment resources and mailboxes must migrate to using app permissions instead. For full instructions, see Configuring Office 365 for |
+| Secure Scheduler for Exchange: deprecation of {{start_time}} and {{end_time}} variables | In a future release we will remove the {{start_time}} and {{end_time}} variables from the following Secure Scheduler for Exchange jinja2 template fields: l Accept new single meeting template l Accept edited single meeting template l Accept new recurring meeting template l Accept edited occurrence template l Accept edited recurring meeting template                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Deprecation of password-based authentication for the Teams Connector CVI                | Certificate-based authentication (CBA) is now the default method to authenticate the Teams Connector CVI application towards MS Graph. You can still use the previous password-based authentication method, but we plan to deprecate it in a future release, thus we recommend using CBA for new installations, or migrating to CBA as soon as practicable when upgrading existing deployments.                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Deprecation of v1 legacy themes                                                         | We plan to deprecate legacy style "version 1" themes in a future release. If you still use v1 themes you should plan to move to using "version 2" themes instead, which have been available since version 18 of Pexip Infinity.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Deprecation of Webapp2                                                                  | Webapp2 is being deprecated, and from January 2027 will no longer be included with Pexip Infinity. If this will impact your deployment, please contact your Pexip authorized support representative.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+<img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000013_b50a20bca6b97386ab4df2d64a811efcb960cd9cd35cffdc5eec5fdb7eb61a60.png"></p>
+<h2>Issues fixed in version 39</h2>
+<h2>Pexip Infinity</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>47585</td>
+<td>Resolved an issue in v39.0 in deployments with multiple custom themes that could cause the wrong watermark to be displayed.</td>
+</tr>
+<tr>
+<td>47170</td>
+<td>Resolved an issue where classification indicators could not be set via the Client API with a call using a Proxying Edge Node.</td>
+</tr>
+<tr>
+<td>44858</td>
+<td>Resolved an issue in a gateway call using an Adaptive Composition or Teams-like layout, where content classifications and banner messages were not shown.</td>
+</tr>
+<tr>
+<td>44427</td>
+<td>Resolved an issue that in some cases caused multiple participants to be created when a call was de-escalated from being transcoded to a direct media call.</td>
+</tr>
+<tr>
+<td>## Pexip Infinity</td>
+<td></td>
+</tr>
+<tr>
+<td>Ref #</td>
+<td>Resolution</td>
+</tr>
+<tr>
+<td>---------</td>
+<td>--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</td>
+</tr>
+<tr>
+<td>46323</td>
+<td>Resolved an issue where with two participants visible in the 1+33 layout, one may not be visible in HD resolution.</td>
+</tr>
+<tr>
+<td>46251</td>
+<td>Resolved an issue where some WebRTC packets may exceed the configured network MTU.</td>
+</tr>
+<tr>
+<td>45680</td>
+<td>For Breakout rooms, using local policy together with external policy no longer causes calls to fail.</td>
+</tr>
+<tr>
+<td>45393</td>
+<td>When one participant in a direct media call disconnects "uncleanly" (e.g. by closing their laptop lid before ending the call), the other participant's call is no longer terminated.</td>
+</tr>
+</tbody>
+</table>
+<p>| 45238 | Resolved an issue where major scene changes could lead to short-term bandwidth usage that exceeded the configured maximum.                                                           |</p>
+<h2>One-Touch Join</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>46232</td>
+<td>OTJ now supports Microsoft Teams meeting invitations that use the new teams.cloud.microsoft and teams.usgovcloud.microsoft domains, which are being rolled out by Microsoft.</td>
+</tr>
+<tr>
+<td>46072</td>
+<td>A Host header is now included in requests to a web proxy, to comply with RFC 2616.</td>
+</tr>
+<tr>
+<td>## Pexip web app</td>
+<td></td>
+</tr>
+<tr>
+<td>Ref #</td>
+<td>Resolution</td>
+</tr>
+<tr>
+<td>-------------</td>
+<td>----------------------------------------------------------------------------------------------------------------------------------------------------------------------------</td>
+</tr>
+<tr>
+<td>46172</td>
+<td>When a participant join a meeting using a preconfigured URL that includes join=1 , they are only asked to enter their name if they have not previously provided it.</td>
+</tr>
+<tr>
+<td>46060</td>
+<td>When a Host participant is in a breakout room, the Mute participants , Allow/disallow participants to unmute and Disconnect all participants options now work as expected.</td>
+</tr>
+<tr>
+<td>46034</td>
+<td>Resolved an issue whereby a breakout room added from the Edit rooms option did not save.</td>
+</tr>
+<tr>
+<td>46024 36674</td>
+<td>Resolved an issue that caused certain headsets with a hardware mute capability (including Jabra headsets) to appear muted when they were not.</td>
+</tr>
+<tr>
+<td><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000014_1d6066ec0717a3cb5f4ddf1f5ebf32ecf92b223070405d27b79dc2fd45cc20f5.png"></td>
+<td></td>
+</tr>
+<tr>
+<td>Ref #</td>
+<td>Resolution</td>
+</tr>
+<tr>
+<td>-------------</td>
+<td>----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</td>
+</tr>
+<tr>
+<td>46010 42368</td>
+<td>Resolved issues with Chrome and Edge browsers on Windows devices that caused a portrait layout to be used or remain active when the aspect ratio no longer required it.</td>
+</tr>
+<tr>
+<td>45824</td>
+<td>If a participant uses the space bar to temporarily unmute and at the same time changes focus to another window, then releases the space bar, they will no longer erroneously see the "You're temporarily unmuted" toast message when switching focus back to the web app window.</td>
+</tr>
+<tr>
+<td>45558</td>
+<td>Resolved an issue that caused clipping or distortion of the audio from participants joining on iOS devices via Safari when using bluetooth earbuds.</td>
+</tr>
+<tr>
+<td>45547</td>
+<td>When a VMR transitions from direct media to transcoded or vice versa, the "All Guests unmuted by Host" toast is no longer erroneously shown.</td>
+</tr>
+<tr>
+<td>44204</td>
+<td>Users with 1Password's Chrome extension installed no longer see a "Save login" popup when interacting with some UI buttons.</td>
+</tr>
+<tr>
+<td>2207</td>
+<td>When Mute all guests has been selected and Allow Guests to unmute is disabled, Guests can no longer unmute themselves using the m keyboard shortcut or the Mute button in the self view window.</td>
+</tr>
+<tr>
+<td>2147</td>
+<td>Resolved an issue experienced by Safari users when joining using the step-by-step flow that caused noise to be heard during the speaker and microphone checking steps.</td>
+</tr>
+<tr>
+<td>2139</td>
+<td>A title is now shown for widgets that appear in the toolbar.</td>
+</tr>
+<tr>
+<td>## Known limitations</td>
+<td></td>
+</tr>
+<tr>
+<td>## Pexip Infinity</td>
+<td></td>
+</tr>
+<tr>
+<td>Ref #</td>
+<td>Limitation</td>
+</tr>
+<tr>
+<td>-------</td>
+<td>--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</td>
+</tr>
+<tr>
+<td>46568</td>
+<td>Outbound calls to RTMP participants that cannot be reached remain in a "connecting" state and do not disconnect cleanly when the TCP connection times out.</td>
+</tr>
+<tr>
+<td>46353</td>
+<td>The configured Guests-only timeout and Last participant backstop timeout do not apply to direct media calls, meaning these calls are not automatically disconnected when only one participant remains.</td>
+</tr>
+</tbody>
+</table>
+<h2>Known Issues</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>42379</td>
+<td>The time-based conference media statistics / graphs introduced in version 36.0 are not present in version 36.1 and later when reviewing participant / conference history in the Administrator interface.</td>
+</tr>
+<tr>
+<td>30756</td>
+<td>Under certain circumstances, when a Conferencing Node is handling calls that include presentation, the observed media load may exceed 100%.</td>
+</tr>
+<tr>
+<td>27534</td>
+<td>A Pexip app that is paired to another video device (such as a SIP endpoint) cannot be used to connect to a Media Playback Service.</td>
+</tr>
+<tr>
+<td>24607</td>
+<td>Changes to cloud bursting configuration may result in an administrator.configuration log message that GCP private key configuration was changed even when it was not.</td>
+</tr>
+<tr>
+<td>24424</td>
+<td>Only 3 of the assigned DNS servers will be used by the Management Node or by a Conferencing Node (as configured in its associated system location).</td>
+</tr>
+<tr>
+<td>19176</td>
+<td>Changing the IP address of the Management Node and then manually rebooting before completing the installation wizard may result in failed connectivity to Conferencing Nodes. To work around this, you must ensure that you re-run and fully complete the installation wizard after changing the Management Node configuration.</td>
+</tr>
+<tr>
+<td>16232</td>
+<td>The Call-id is not logged on an administrative event when a Guest joins a conference and all Guests are muted.</td>
+</tr>
+<tr>
+<td>16119</td>
+<td>"License limit reached" alarms are not lowered as expected, even though an appropriate "Alarm lowered" message is logged.</td>
+</tr>
+<tr>
+<td>15943</td>
+<td>"Connectivity lost between nodes" alarms are not recorded in the alarm history ( History &amp; Logs &gt; Alarm History ).</td>
+</tr>
+<tr>
+<td>13305</td>
+<td>The G.719 codec is not currently supported for SIP.</td>
+</tr>
+<tr>
+<td>12218</td>
+<td>In some call scenarios that take a long time for the call setup to complete (for example calls that involve ICE, a Conferencing Node behind static NAT, and where the client is also behind a NAT) any audio prompts (such as requests to enter a PIN) may be played too early and the client may not hear all of the message.</td>
+</tr>
+<tr>
+<td>7906</td>
+<td>If a caller dials into a Virtual Reception and enters the number of the conference they want to join, but there are insufficient hardware resources available to join the caller to that conference, the caller is disconnected from the Virtual Reception.</td>
+</tr>
+<tr>
+<td>6739</td>
+<td>Any changes made to VMR configuration -such as updating the participant limit -while the conference is ongoing do not take immediate effect, and may result in conference separation (i.e. new participants will join a separate VMR from those that are currently connected). All participants must disconnect from the conference for the change to take effect.</td>
+</tr>
+<tr>
+<td>5601</td>
+<td>When changing the certificates in a chain, a reboot of the associated Conferencing Nodes may be required if the changes do not produce the desired effect.</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Image" src="/img/docs/pexip-infinity-release-notes-v39-1-a/image_000015_1d6066ec0717a3cb5f4ddf1f5ebf32ecf92b223070405d27b79dc2fd45cc20f5.png"></p>
+<h2>Pexip Teams Connector</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>35285</td>
+<td>Participants connected via Azure Communication Services (ACS) will not see video from participants joining via CVI as "trusted". We are working with Microsoft to address the issue that these participants are filtered out. A temporary workaround is to configure your system so that CVI participants connect as normal/untrusted guests, and ensure that someone admits them from the lobby. Please contact your Pexip authorized support representative for assistance and refer to issue #35285.</td>
+</tr>
+</tbody>
+</table>
+<p>|   34367 | A Microsoft Teams Room that joins a VMR as a Guest is not treated as a Guest. For example, it will not be muted if "mute all Guests" is triggered. |
+|   27854 | In a large Teams meeting you may see a discrepancy in the participant count on Pexip versus that which is reported on the Teams side. We are working with Microsoft to resolve this. |</p>
+<h2>Poly/Polycom</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|    4812 | In some instances, one of two messages sent to a VMR from two SfB clients not previously connected may not be properly retained by the VMR. To resolve, re-send the message.                                                                                                                                                                                            |
+|    4195 | Participants connected via the Infinity Gateway into a SfB meeting may not receive presentation content from SfB participants. This occurs if the SfB user has a screen resolution where the width is an odd number of pixels, such as a resolution of 1437x758. If this occurs, one workaround is for the user to share an application rather than their full desktop. |</p>
+<h2>Secure Scheduler for Exchange</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>42882</td>
+<td>When editing a recurring meeting, the option to edit This and all following events is not supported. You must instead choose to edit All events in the series .</td>
+</tr>
+<tr>
+<td>19530</td>
+<td>When using Microsoft's OWAwith Office 365 account, join instructions that use the <style> element will not be added, even though the "Success" message is displayed to the user.</td>
+</tr>
+<tr>
+<td>16602</td>
+<td>In some circumstances, users are not able to obtain a VMR for a meeting if an existing meeting invitation is being edited and has previously had a VMR assigned. This may happen if a user has previously activated the add-in when editing an invitation but then discarded their changes, or if the user has removed the information added to the invitation when the add-in was previously activated. By default, users will see a message "VMR already assigned".</td>
+</tr>
+</tbody>
+</table>
+<h2>One-Touch Join</h2>
+<table>
+<thead>
+<tr>
+<th>Ref #</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>32706</td>
+<td>Poly Trio endpoints running software version 7.x do not display meeting reminders or join notifications.</td>
+</tr>
+</tbody>
+</table>
   </main>
 </body>
 </html>

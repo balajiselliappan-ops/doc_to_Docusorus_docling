@@ -89,21 +89,65 @@ def _is_token_limit_error(error: Exception) -> bool:
     return any(signal in message for signal in token_signals)
 
 
+def _is_markdown_table_line(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+    if stripped.startswith("|") and stripped.count("|") >= 2:
+        return True
+    if re.match(r"^\|?\s*:?[-]{3,}:?\s*(\|\s*:?[-]{3,}:?\s*)+\|?$", stripped):
+        return True
+    return False
+
+
 def _chunk_text(text: str) -> list[str]:
-    """Split text at paragraph boundaries into CHUNK_SIZE chunks, capped at MAX_CHUNKS."""
-    chunks = []
-    remaining = text.strip()
-    while len(remaining) > CHUNK_SIZE:
-        split_at = remaining.rfind("\n\n", 0, CHUNK_SIZE)
-        if split_at == -1:
-            split_at = remaining.rfind("\n", 0, CHUNK_SIZE)
-        if split_at == -1:
-            split_at = CHUNK_SIZE
-        chunks.append(remaining[:split_at].strip())
-        remaining = remaining[split_at:].strip()
-    if remaining:
-        chunks.append(remaining)
-    return chunks[:MAX_CHUNKS]
+    """Split text into chunks without cutting markdown/html tables in half."""
+    lines = text.strip().splitlines()
+    if not lines:
+        return []
+
+    chunks: list[str] = []
+    current: list[str] = []
+    current_len = 0
+    in_html_table = False
+    in_markdown_table = False
+
+    for idx, line in enumerate(lines):
+        lower = line.lower()
+        if "<table" in lower:
+            in_html_table = True
+
+        is_md_table_line = _is_markdown_table_line(line)
+        line_len = len(line) + 1
+        would_overflow = bool(current and (current_len + line_len > CHUNK_SIZE))
+
+        # Do not split while inside table context.
+        if would_overflow and not (in_html_table or in_markdown_table or is_md_table_line):
+            if len(chunks) >= MAX_CHUNKS - 1:
+                remaining = current + lines[idx:]
+                chunks.append("\n".join(remaining).strip())
+                return [chunk for chunk in chunks if chunk][:MAX_CHUNKS]
+            chunks.append("\n".join(current).strip())
+            current = []
+            current_len = 0
+
+        current.append(line)
+        current_len += line_len
+
+        if is_md_table_line:
+            in_markdown_table = True
+        elif in_markdown_table and not line.strip():
+            in_markdown_table = False
+        elif in_markdown_table and line.strip() and not is_md_table_line:
+            in_markdown_table = False
+
+        if "</table>" in lower:
+            in_html_table = False
+
+    if current:
+        chunks.append("\n".join(current).strip())
+
+    return [chunk for chunk in chunks if chunk][:MAX_CHUNKS]
 
 
 def _convert_with_ai(text: str, title: str, slug: str, is_continuation: bool = False) -> tuple[str, str]:
@@ -131,8 +175,12 @@ def _convert_with_ai(text: str, title: str, slug: str, is_continuation: bool = F
                 "- Keep heading structure coherent.\n"
                 "- Remove repeated headers/footers and OCR noise.\n"
                 "- Use valid Markdown only; no code fences around whole output.\n"
-                "- Preserve any detected tables and tabular columns as markdown tables; do not flatten them into prose.\n"
-                "- If input already contains HTML <table> blocks, preserve them as-is (including merged cells / colspan).\n"
+                "- Preserve all detected tables.\n"
+                "- For simple tables, use markdown pipe tables.\n"
+                "- For merged cells (rowspan/colspan) or multi-line cells, output raw HTML <table>...</table> with proper rowspan/colspan.\n"
+                "- Never flatten tables into prose.\n"
+                "- Never split a table; output complete table blocks only.\n"
+                "- If input already contains HTML <table> blocks, keep them as-is.\n"
                 "- Do NOT include frontmatter (no --- blocks).\n"
                 "- Return only final markdown (no thinking/explanations).\n\n"
                 "Document section:\n"
@@ -145,8 +193,12 @@ def _convert_with_ai(text: str, title: str, slug: str, is_continuation: bool = F
                 "- Keep heading structure coherent.\n"
                 "- Remove repeated headers/footers and OCR noise.\n"
                 "- Use valid Markdown only; no code fences around whole output.\n"
-                "- Preserve any detected tables and tabular columns as markdown tables; do not flatten them into prose.\n"
-                "- If input already contains HTML <table> blocks, preserve them as-is (including merged cells / colspan).\n"
+                "- Preserve all detected tables.\n"
+                "- For simple tables, use markdown pipe tables.\n"
+                "- For merged cells (rowspan/colspan) or multi-line cells, output raw HTML <table>...</table> with proper rowspan/colspan.\n"
+                "- Never flatten tables into prose.\n"
+                "- Never split a table; output complete table blocks only.\n"
+                "- If input already contains HTML <table> blocks, keep them as-is.\n"
                 f"- title must be: {title}\n"
                 f"- slug must be: /{slug}\n"
                 "- Return only final markdown (no thinking/explanations).\n\n"
@@ -238,7 +290,7 @@ def to_docusaurus_markdown(text: str, file_path: str) -> tuple[str, str]:
         first_md, engine_name = _convert_with_ai(chunks[0], title, slug, is_continuation=False)
 
         if len(chunks) == 1:
-            return first_md, engine_name
+            return _normalize_table_boundaries(first_md), engine_name
 
         parts = [first_md]
         for i, chunk in enumerate(chunks[1:], start=2):
@@ -253,17 +305,135 @@ def to_docusaurus_markdown(text: str, file_path: str) -> tuple[str, str]:
                 logger.warning("Chunk %d failed, using raw fallback chunk: %s", i, chunk_err)
                 parts.append(chunk.strip())
 
-        return "\n\n".join(parts) + "\n", engine_name
+        joined = "\n\n".join(parts) + "\n"
+        return _normalize_table_boundaries(joined), engine_name
 
     except Exception as error:
         logger.warning("AI conversion failed, falling back to pandoc: %s", error)
         markdown = _convert_with_pandoc(text, title, slug)
-        return markdown, "pandoc"
+        return _normalize_table_boundaries(markdown), "pandoc"
+
+
+def _normalize_table_boundaries(markdown_text: str) -> str:
+    # Keep table blocks separated from surrounding text.
+    text = re.sub(r"([^\n])\n(\|[^\n]+\|)", r"\1\n\n\2", markdown_text)
+    text = re.sub(r"(\|[^\n]+\|)\n([^\n|<])", r"\1\n\n\2", text)
+
+    # Collapse blank lines that appear inside markdown pipe tables.
+    lines = text.splitlines()
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if re.match(r"^\|.*\|$", line.strip()):
+            out.append(line)
+            i += 1
+            # Inside a table block, drop empty lines between table rows.
+            while i < len(lines):
+                cur = lines[i].strip()
+                if cur == "":
+                    j = i + 1
+                    while j < len(lines) and lines[j].strip() == "":
+                        j += 1
+                    if j < len(lines) and re.match(r"^\|.*\|$", lines[j].strip()):
+                        i = j
+                        continue
+                    out.append("")
+                    i += 1
+                    break
+                if re.match(r"^\|.*\|$", cur):
+                    out.append(lines[i])
+                    i += 1
+                    continue
+                break
+            continue
+
+        out.append(line)
+        i += 1
+
+    return "\n".join(out)
+#def _normalize_table_boundaries(markdown_text: str) -> str:
+ ##  text = re.sub(r"([^\n])\n(\|[^\n]+\|)", r"\1\n\n\2", markdown_text)
+   # text = re.sub(r"(\|[^\n]+\|)\n([^\n|<])", r"\1\n\n\2", text)
+    #return text
 
 
 def to_mdx(text: str, file_path: str) -> str:
     markdown, _ = to_docusaurus_markdown(text, file_path)
     return markdown
+
+
+def _split_frontmatter(markdown_text: str) -> tuple[str, str]:
+    match = re.match(r"(?ms)^---\n(.*?)\n---\n?", markdown_text.strip())
+    if not match:
+        return "", markdown_text.strip()
+    return match.group(1), markdown_text[match.end():].strip()
+
+
+def _extract_title_slug(frontmatter: str, fallback_slug: str, fallback_title: str) -> tuple[str, str]:
+    title_match = re.search(r'(?m)^title:\s*"?(.+?)"?\s*$', frontmatter or "")
+    slug_match = re.search(r'(?m)^slug:\s*(.+?)\s*$', frontmatter or "")
+    title = (title_match.group(1).strip() if title_match else fallback_title).strip('"')
+    slug = (slug_match.group(1).strip() if slug_match else f"/{fallback_slug}").strip()
+    if not slug.startswith("/"):
+        slug = f"/{slug}"
+    return title, slug
+
+
+def rewrite_docling_image_paths(markdown_text: str, source_name: str, doc_slug: str) -> str:
+    """
+    Convert backend-local image refs into Docusaurus static paths.
+    uploads/_docling_assets/<source>/<source>_artifacts/file.png -> /img/docs/<doc_slug>/file.png
+    """
+    pattern = (
+        rf"uploads/_docling_assets/{re.escape(source_name)}/"
+        rf"{re.escape(source_name)}_artifacts/([^)\s]+)"
+    )
+    return re.sub(pattern, rf"/img/docs/{doc_slug}/\1", markdown_text)
+
+
+def split_markdown_by_chapters(markdown_text: str, source_slug: str) -> list[tuple[str, str]]:
+    """Split markdown into chapter files using level-2 headings (## ...)."""
+    frontmatter, body = _split_frontmatter(markdown_text)
+    base_title, base_slug = _extract_title_slug(
+        frontmatter,
+        fallback_slug=source_slug,
+        fallback_title=source_slug.replace("-", " ").title(),
+    )
+
+    lines = body.splitlines()
+    chapter_indices = [i for i, line in enumerate(lines) if re.match(r"^##\s+\S", line)]
+
+    if not chapter_indices:
+        filename = f"01-{source_slug}.md"
+        chapter_frontmatter = (
+            "---\n"
+            f'title: "{_escape_title(base_title)}"\n'
+            f"slug: {base_slug}\n"
+            "sidebar_position: 1\n"
+            "---\n\n"
+        )
+        return [(filename, chapter_frontmatter + body.strip() + "\n")]
+
+    chapter_files: list[tuple[str, str]] = []
+    for idx, start in enumerate(chapter_indices, start=1):
+        end = chapter_indices[idx] if idx < len(chapter_indices) else len(lines)
+        chunk = "\n".join(lines[start:end]).strip()
+
+        heading = re.sub(r"^##\s+", "", lines[start]).strip()
+        chapter_slug = _slugify(heading) or f"chapter-{idx}"
+
+        chapter_frontmatter = (
+            "---\n"
+            f'title: "{_escape_title(heading)}"\n'
+            f"slug: {base_slug}/{chapter_slug}\n"
+            f"sidebar_position: {idx}\n"
+            "---\n\n"
+        )
+        filename = f"{idx:02d}-{chapter_slug}.md"
+        chapter_files.append((filename, chapter_frontmatter + chunk + "\n"))
+
+    return chapter_files
 
 
 def _highlight_keywords(html: str, keywords: list[str]) -> str:
@@ -279,15 +449,25 @@ def _highlight_keywords(html: str, keywords: list[str]) -> str:
     return updated
 
 
-def _inline_images(html: str, output_dir: str) -> str:
+def _inline_images(html: str, output_dir: str, img_docs_dir: str | None = None) -> str:
     """Replace relative <img src="..."> paths with base64 data URLs."""
     def replace_src(m):
         src = m.group(1)
         # Skip already-inlined or remote URLs
         if src.startswith("data:") or src.startswith("http"):
             return m.group(0)
-        # Resolve path: src is relative to output_dir
-        img_path = os.path.normpath(os.path.join(output_dir, src))
+
+        img_path = None
+        if src.startswith("/img/docs/") and img_docs_dir:
+            # Map /img/docs/<doc-slug>/<file> to output/docusaurus-assets/<doc-slug>/<file>
+            rel = src[len("/img/docs/") :]
+            img_path = os.path.normpath(os.path.join(img_docs_dir, rel))
+        elif not os.path.isabs(src):
+            # Resolve path: relative src paths are resolved from output_dir
+            img_path = os.path.normpath(os.path.join(output_dir, src))
+
+        if not img_path:
+            return m.group(0)
         if not os.path.isfile(img_path):
             return m.group(0)
         mime, _ = mimetypes.guess_type(img_path)
@@ -299,7 +479,7 @@ def _inline_images(html: str, output_dir: str) -> str:
     return re.sub(r'src="([^"]+)"', replace_src, html)
 
 
-def to_html_page(markdown_text: str, output_dir: str | None = None) -> str:
+def to_html_page(markdown_text: str, output_dir: str | None = None, img_docs_dir: str | None = None) -> str:
     body_markdown = re.sub(r"(?ms)^---\n.*?\n---\n?", "", markdown_text).strip()
     # Strip [TOC] markers the AI sometimes emits — we don't want a generated TOC
     body_markdown = re.sub(r"^\[TOC\]\s*", "", body_markdown, flags=re.IGNORECASE | re.MULTILINE)
@@ -309,7 +489,11 @@ def to_html_page(markdown_text: str, output_dir: str | None = None) -> str:
         output_format="html5",
     )
     if output_dir:
-        html_body = _inline_images(html_body, os.path.abspath(output_dir))
+        html_body = _inline_images(
+            html_body,
+            os.path.abspath(output_dir),
+            img_docs_dir=os.path.abspath(img_docs_dir) if img_docs_dir else None,
+        )
 
     if HIGHLIGHT_KEYWORDS:
         html_body = _highlight_keywords(html_body, HIGHLIGHT_KEYWORDS)

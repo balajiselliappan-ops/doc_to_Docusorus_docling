@@ -3,15 +3,22 @@ title: "Mx6100 Card Issuance System Overview Br"
 slug: /mx6100-card-issuance-system-overview-br
 ---
 
+title: Mx6100 Card Issuance System Overview Br
+slug: /mx6100-card-issuance-system-overview-br
+
+# Mx6100 Card Issuance System Overview Br
+
 ## SOLUTION BROCHURE
+
 ## Datacard® MX Series System
+
 World's Best-Selling High-Volume, Card-To-Envelope Solution
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000000_acefafd9232646d9678f86366b449694628abb1982e4990598a757890f6f0d1f.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000000_acefafd9232646d9678f86366b449694628abb1982e4990598a757890f6f0d1f.png)
 
 The Datacard® MX Series solution features the most versatile card personalization technologies for cardholder customization. This flagship solution combines security, reliability, and a variety of innovative and flexible technologies to deliver highly personalized cards, labels, and carriers all inline - creating a feature-rich card-to-envelope solution.
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000001_13f3e37a08078126fd09b46f03cda1baebf6df33fd71b8262bce057de984da25.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000001_13f3e37a08078126fd09b46f03cda1baebf6df33fd71b8262bce057de984da25.png)
 
 MX6100™ MXD611™ MXi610™
 
@@ -56,7 +63,7 @@ This flagship card issuance system (not just of our portfolio but of the industr
 - Datacard® MXD611™ Card Delivery System
 - Datacard® MXi610™ Envelope Insertion System
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000002_bc70b53a2ca351f6503ec4697e8d1a45626549e0e2a3b420b6e50eb9187e1ddc.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000002_bc70b53a2ca351f6503ec4697e8d1a45626549e0e2a3b420b6e50eb9187e1ddc.png)
 
 1 spans more than 150 countries worldwide. Online and phone support is available 24/7.
 
@@ -86,9 +93,9 @@ Advanced intelligence built into the MX6100 System enables fully automated, inli
 
 The MX Series Systems are supported by the industry's largest service and support network, which spans more than 150 countries worldwide. Online and phone support is available 24/7.
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000003_12c681500d320c56a50b7c2f23a5e50adba99bcfc5450e78398c34c00a37f309.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000003_12c681500d320c56a50b7c2f23a5e50adba99bcfc5450e78398c34c00a37f309.png)
 
-- Card Affixing
+### Card Affixing
 
 | • Card Affixing           | • Form Buffer            |
 |---------------------------|--------------------------|
@@ -102,11 +109,11 @@ The MX Series Systems are supported by the industry's largest service and suppor
 
 Flexible, Feature-Rich Card-To-Envelope Solutions 883-123-4567 or financial.com/college for nearest branch USTOMER 998 VANESSA WATTS GOOL THRU 1201 ITRU
 
-ENTRUST
+## ENTRUST
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000004_71f9a013216f7cd74e28fd551853e41949242d7b7b8a7df1fdf9d65775ea3a1d.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000004_71f9a013216f7cd74e28fd551853e41949242d7b7b8a7df1fdf9d65775ea3a1d.png)
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000005_8a507b9e3037a79fe489fb20f197bf5ef3cff98301562b2b160466ef3e941b3e.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000005_8a507b9e3037a79fe489fb20f197bf5ef3cff98301562b2b160466ef3e941b3e.png)
 
 ## NATIONAL IDENTIFICATION
 
@@ -138,7 +145,7 @@ Card carrier sorting provides the flexibility to remove inefficiencies from the 
 Support Market Trends: Meet the growing vertical card trend without limiting job sizes based on card orientation. Dynamically place cards on carriers horizontally and vertically to meet customer requests.
 
 MXD611 Card Delivery System  
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000006_003532df9df675b790257a1b84c7694b38f82c848071b42a3af44d89ea0d5cf6.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000006_003532df9df675b790257a1b84c7694b38f82c848071b42a3af44d89ea0d5cf6.png)
 
 ## Comprehensive Envelope Insertion
 
@@ -170,13 +177,12 @@ Print on-demand, personalized messaging, or static logo graphics on the envelope
 
 Card carrier feeding supports the insertion of additional card carriers in a single package. This allows for more gift or reward cards to be bundled in one package.
 
-## Complete Card-To-Envelope Solutions
-
+Complete Card-To-Envelope Solutions  
 0001101900010S07819998  
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000007_bbca44c3d620d976a6e3036efe88543c775cb3f5d39987082e74a7bd83011b56.png)  
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000008_a9cd9140c2f086e67ed8a188084d6fad52b6bfccdce50e0476bead4dbdb9a72e.png)  
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000009_4cdf4387bad4473eab2c724a26f550502e51774be7d382d9b72c39d0aa59d5a5.png)  
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000010_22b1befd1b190bf53a31d01e5711108d10a089b5a09dd1335bf6b16aa2845f48.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000007_bbca44c3d620d976a6e3036efe88543c775cb3f5d39987082e74a7bd83011b56.png)  
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000008_a9cd9140c2f086e67ed8a188084d5fad52b6bfccdce50e0476bead4dbdb9a72e.png)  
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000009_4cdf4387bad4473eab2c724a26f550502e51774be7d382d9b72c39d0aa59d5a5.png)  
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000010_22b1befd1b190bf53a31d01e5711108d10a089b5a09dd1335bf6b16aa2845f48.png)
 
 With the MXi610 System, you can choose from the following modules:
 
@@ -205,23 +211,20 @@ With the MXi610 System, you can choose from the following modules:
 | Storage Requirements                               | Room temperature: 50° to 130° F (10° to 54° C); Humidity: 0% to 85% (non-condensing)                                                                                                                                                      |
 | Agency Approvals                                   | FCC, UL, cUL, CE, and RoHS Compliant                                                                                                                                                                                                      |
 | Card Types Supported                               | ISO/IEC 7810 ID-1 Size; 30 mil (+/- 10%)                                                                                                                                                                                                  |
-
-| Card Materials Supported | Most card materials can be processed, including PVC, composite, polycarbonate, ABS, PET, and PETG. Limitations may exist for each personalization or verification technology. |
-|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Paper Types Supported     | 20-24 lb bond paper (90.3 gsm) See Card Delivery Paper/Envelope Guidelines.                                                                                                                                                              |
+| Card Materials Supported                           | Most card materials can be processed, including PVC, composite, polycarbonate, ABS, PET, and PETG. Limitations may exist for each personalization or verification technology.                                                             |
+| Paper Types Supported                              | 20-24 lb bond paper (90.3 gsm) See Card Delivery Paper/Envelope Guidelines.                                                                                                                                                               |
 
 Note: MX6100 System modules cannot be used in the Datacard ®  MX2100 ™  Card Issuance System and MX2100 System modules cannot be used in the MX6100 System.
 
 ## Flexible End-To-End Issuance
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000011_5075959fd8ced27285458b290d41a98637dc9562de296d9f92bf919c9677686e.png)
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000011_5075959fd8ced27285458b290d41a98637dc9562de296d9f92bf919c9677686e.png)
-
-## About Entrust
+## A B O U T  ENTRUS T
 
 Entrust fights fraud and cyber threats with identity-centric security that protects people, devices, and data. Our comprehensive solutions help organizations secure every step of the identity lifecycle, from verifying identity at onboarding to securing connections and fighting fraud in everyday transactions. Ongoing monitoring supports compliance and safeguards keys, secrets, and certificates. With a foundation of identity-centric security, our customers can transact and grow with confidence. Entrust has a global partner network and supports customers in over 150 countries.
 
-Learn more about the MX Series at [entrust.com](http://entrust.com)
+Learn more about the MX Series at entrust.com
 
 ©2025 Entrust Corporation. All rights reserved. Entrust, Datacard, and the hexagon logo are trademarks, registered trademarks, and/or service marks of Entrust Corporation in the U.S. and/or other countries. All other brand or product names are the property of their respective owners. CI26Q2-mx-6100-series-card-issuance-system-br
 
-![Image](uploads/_docling_assets/mx6100-card-issuance-system-overview-br/mx6100-card-issuance-system-overview-br_artifacts/image_000012_2e2cf06f4db66561a0ebcaa27c62c49749d3c19a1458b9a3e4ce4af484980737.png)
+![Image](/img/docs/mx6100-card-issuance-system-overview-br/image_000012_2e2cf06f4db66561a0ebcaa27c62c49749d3c19a1458b9a3e4ce4af484980737.png)
